@@ -363,9 +363,7 @@ class Form implements OutputableInterface
      */
     public function addMeta()
     {
-        if (empty($this->meta)) {
-            $this->meta = $this->factory->createMeta();
-        }
+        $this->meta = $this->factory->createMeta();
 
         return $this->meta;
     }

@@ -83,7 +83,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Calendar/calendar_manage_a
     $form->addRow()->addHeading(__('Access'));
 
     $row = $form->addRow();
-        $row->addLabel('public', __('Public'))->description(__('If yes, members of the public can see events on this calendar.'));
+        $row->addLabel('public', __('Public'))->description(__('If yes, members of the public can see events on this calendar without logging in.'));
         $row->addYesNo('public')->selected('N');
 
     $row = $form->addRow();

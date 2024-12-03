@@ -37,4 +37,18 @@ class CalendarEventGateway extends QueryableGateway
     private static $primaryKey = 'gibbonCalendarEventID';
 
     private static $searchableColumns = [];
+
+    public function selectCalendarEvents()
+    {
+
+        $sql = "SELECT 
+                    gibbonCalendarEventID as id,
+                    name as title,
+                    (CASE WHEN allDay='N' THEN CONCAT(dateStart, 'T', timeStart) ELSE dateStart END) as start,
+                    (CASE WHEN allDay='N' THEN CONCAT(dateEnd, 'T', timeEnd) ELSE dateEnd END) as end
+                FROM gibbonCalendarEvent
+                ORDER BY gibbonCalendarEvent.dateStart, gibbonCalendarEvent.dateEnd";
+
+        return $this->db()->select($sql);
+    }
 }

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        table, th, td { border: 1px solid black; }
+        th, td { padding: 10px; text-align: left; }
+        .header { text-align: center; }
+        .attendance, .academic-scale { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Clement Howell High School</h1>
+        <h2>Student Report</h2>
+        <p>"Commitment to Excellence"</p>
+    </div>
+
+    <div class="student-info">
+        <h3>Student Details</h3>
+        <p><strong>Name:</strong> {{ student.name }}</p>
+        <p><strong>Student ID:</strong> {{ student.id }}</p>
+        <p><strong>Form Group:</strong> {{ student.formGroup }}</p>
+        <p><strong>Tutor:</strong> {{ student.tutor }}</p>
+    </div>
+
+    <div class="attendance">
+        <h3>Attendance</h3>
+        <table>
+            <tr>
+                <th>Present</th>
+                <th>Absent</th>
+                <th>Late</th>
+            </tr>
+            <tr>
+                <td>{{ attendance.present }}</td>
+                <td>{{ attendance.absent }}</td>
+                <td>{{ attendance.late }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="courses">
+        <h3>Course Grades</h3>
+        <table>
+            <tr>
+                <th>Course</th>
+                <th>Teacher</th>
+                <th>Grade</th>
+            </tr>
+            {% for course in courses %}
+            <tr>
+                <td>{{ course.name }}</td>
+                <td>{{ course.teacher }}</td>
+                <td>{{ course.grade }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="academic-scale">
+        <h3>Academic Scale</h3>
+        <ul>
+            <li><strong>A:</strong> 85%-100% Excellent</li>
+            <li><strong>B:</strong> 70%-84% Very Good</li>
+            <li><strong>C:</strong> 60%-69% Good</li>
+            <li><strong>D:</strong> 50%-59% Fair</li>
+            <li><strong>E:</strong> 40%-49% Poor</li>
+            <li><strong>F:</strong> Below 39% Very Poor</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,59 @@
+{#<!--
+name: Average
+category: Average Template
+types: Body
+sources:
+    student: Student
+    reportingCycle: ReportingCycle
+    courseCriteriaByCycle: CourseCriteriaByCycle
+-->#}
+{{- stylesheet ? include(stylesheet) -}}
+
+{% set overallTotalGrades = 0 %}
+{% set overallGradeCount = 0 %}
+
+{# Iterate over courses #}
+{% for course in courseCriteriaByCycle %}
+    {% set courseTotalGrades = 0 %}
+    {% set courseGradeCount = 0 %}
+
+    {# Iterate over cycles #}
+    {% for cycleNum in range(1, reportingCycle.cycleTotal|default(1)) %}
+        {% set cycleName = reportingCycle.cycles[cycleNum]|default('') %}
+        
+        {# Check each criteria #}
+        {% for criteria in course.perStudent %}
+            {% if criteria.valueType != 'Comment' %}
+                {# Extract and sanitize the grade value #}
+                {% set rawGrade = criteria.values[cycleName].value|default('0') %}
+                {% set sanitizedGrade = rawGrade|replace({'%': ''})|trim %}
+                
+                {# Check if sanitized grade is numeric #}
+                {% if sanitizedGrade matches '/^-?\\d+(\\.\\d+)?$/' %}
+                    {% set grade = sanitizedGrade + 0 %}
+                    {% set courseTotalGrades = courseTotalGrades + grade %}
+                    {% set courseGradeCount = courseGradeCount + 1 %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+
+    {# Update overall totals #}
+    {% set overallTotalGrades = overallTotalGrades + courseTotalGrades %}
+    {% set overallGradeCount = overallGradeCount + courseGradeCount %}
+{% endfor %}
+
+{# Calculate the overall average grade #}
+{% set overallAverage = overallGradeCount > 0 ? (overallTotalGrades / overallGradeCount)|round(2) : 'N/A' %}
+
+{# Display the results in a table #}
+<table class="w-full table" cellspacing="0" cellpadding="4" nobr="true">
+    <tr>
+        <td colspan="2" class="header bg-primary border">
+            Overall Average
+        </td>
+        <td class="border bg-secondary">
+            {{ overallAverage }}
+        </td>
+    </tr>
+</table>

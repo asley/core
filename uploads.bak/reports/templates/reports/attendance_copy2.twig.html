@@ -1,0 +1,88 @@
+{#<!--
+name: Attendance - Single Cycle Compact
+category: Student Data
+sources:
+    student: Student
+    attendance: AttendanceByCycle
+    reportingCycle: ReportingCycle
+config:
+    includePresent:
+        label: Include Present?
+        type: yesno
+        default: Y
+-->#}
+{{- stylesheet ? include(stylesheet) -}}
+
+<style>
+    @page {
+        size: legal portrait;
+        margin: 0.5in;
+    }
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 8pt; /* Smaller font size */
+    }
+    table {
+        width: 60%; /* Smaller table width */
+        margin: auto; /* Center align the table */
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #000;
+        text-align: center;
+        padding: 3px; /* Reduced padding */
+        line-height: 1.2; /* Reduced line height */
+    }
+    .header {
+        background-color: #d9d9d9;
+        font-weight: bold;
+    }
+    .subheader {
+        background-color: #f0f0f0;
+        font-style: italic;
+    }
+</style>
+
+{% if reportingCycle and attendance %}
+    {% set cycleNum = 1 %}
+    {% set cycleName = reportingCycle.cycles[cycleNum] | default('Cycle ' ~ cycleNum) %}
+
+    <table cellspacing="0" cellpadding="2" nobr="true">
+        <thead>
+            <tr>
+                <th class="header" colspan="4">{{ cycleName }} Attendance Summary</th>
+            </tr>
+            <tr>
+                {% if config.includePresent == 'Y' %}
+                <th class="subheader">Present</th>
+                {% endif %}
+                <th class="subheader">Absent</th>
+                <th class="subheader">Late</th>
+                <th class="subheader">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% if config.includePresent == 'Y' %}
+                <td>
+                    {{ attendance[cycleNum].present | default(0) }}
+                </td>
+                {% endif %}
+                <td>
+                    {{ attendance[cycleNum].absent | default(0) }}
+                </td>
+                <td>
+                    {{ attendance[cycleNum].late | default(0) }}
+                </td>
+                <td>
+                    {% set total = (attendance[cycleNum].present|default(0)) 
+                                    + (attendance[cycleNum].absent|default(0)) 
+                                    + (attendance[cycleNum].late|default(0)) %}
+                    {{ total }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+{% else %}
+    <p style="text-align: center; font-size: 8pt;">No attendance data available for the selected cycle.</p>
+{% endif %}

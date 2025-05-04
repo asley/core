@@ -1,0 +1,29 @@
+<div class="lesson-plan-generator">
+    <h2>{{ __('Lesson Plan Generator') }}</h2>
+    <form id="lessonPlanForm" action="{{ absoluteURL }}/modules/ChatBot/TeachingAssistantController.php" method="POST">
+        <div class="form-group">
+            <label for="courseName">{{ __('Course Name') }}</label>
+            <input type="text" id="courseName" name="courseName" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="topics">{{ __('Topics') }}</label>
+            <textarea id="topics" name="topics" required class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="duration">{{ __('Duration (minutes)') }}</label>
+            <input type="number" id="duration" name="duration" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="bloomsLevel">{{ __('Bloom\'s Level') }}</label>
+            <select id="bloomsLevel" name="bloomsLevel" required class="form-control">
+                <option value="remember">{{ __('Remember') }}</option>
+                <option value="understand">{{ __('Understand') }}</option>
+                <option value="apply">{{ __('Apply') }}</option>
+                <option value="analyze">{{ __('Analyze') }}</option>
+                <option value="evaluate">{{ __('Evaluate') }}</option>
+                <option value="create">{{ __('Create') }}</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">{{ __('Generate Lesson Plan') }}</button>
+    </form>
+</div>

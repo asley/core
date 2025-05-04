@@ -1,0 +1,16 @@
+{
+    "name": "chhs/chatbot",
+    "require-dev": {
+        "phpunit/phpunit": "^10"
+    },
+    "autoload": {
+        "psr-4": {
+            "CHHS\\Modules\\ChatBot\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CHHS\\Modules\\ChatBot\\Tests\\": "tests/"
+        }
+    }
+}

@@ -1,0 +1,196 @@
+{#<!--
+name: Internal Assessment Report - March 2025
+category: Student Data
+types: Body
+sources:
+    student: Student
+    internalAssessmentByCourse: InternalAssessmentByCourse
+    reportingCycle: ReportingCycle
+config:
+    includeAverage:
+        label: Show Cycle Average?
+        type: yesno
+        default: Y
+    limitByReportingCycle:
+        label: Filter by Reporting Period?
+        type: yesno
+        default: Y
+-->#}
+
+<style>
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 20px 0;
+}
+.report-table th {
+    background: #f5f5f5;
+    color: #333;
+    padding: 14px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+.report-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    vertical-align: middle;
+}
+.report-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+.header-row {
+    background: #f5f5f5;
+    color: #333;
+    font-weight: bold;
+}
+.subject-cell {
+    font-weight: bold;
+    text-align: left;
+    padding-left: 20px;
+    background: #f9f9f9;
+}
+.comment-row {
+    background: #ffffff;
+    font-size: 11px;
+    line-height: 1.3;
+    text-align: left !important;
+    padding-left: 30px;
+}
+.average-cell {
+    background: #f0f0f0;
+    font-weight: bold;
+    color: #333;
+    text-align: right;
+    padding-right: 20px;
+}
+.debug-output {
+    background: #ffe6e6;
+    color: #990000;
+    font-size: 11px;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #cc0000;
+}
+</style>
+
+<table class="report-table">
+    <tr class="header-row">
+        <th rowspan="2">Subjects</th>
+        {% for cycleNum in 1..reportingCycle.cycleTotal %}
+        <th colspan="2">{{ reportingCycle.cycles[cycleNum] }}</th>
+        {% endfor %}
+    </tr>
+    <tr class="header-row">
+        {% for cycleNum in 1..reportingCycle.cycleTotal %}
+        <th>Grade</th>
+        <th>Effort</th>
+        {% endfor %}
+    </tr>
+
+    {% for course, assessments in internalAssessmentByCourse.courses %}
+    <tr>
+        <td class="subject-cell">{{ course }}</td>
+        
+        {% for cycleNum in 1..reportingCycle.cycleTotal %}
+            {% set targetCycleName = reportingCycle.cycles[cycleNum] %}
+            {% set assessment = {} %}
+            
+            {# Find assessment by cycle name with typo tolerance #}
+            {% for assessmentName, assessmentData in assessments %}
+                {% if assessmentData.name|trim|lower == targetCycleName|trim|lower %}
+                    {% set assessment = assessmentData %}
+                {% endif %}
+            {% endfor %}
+            
+            <td style="text-align: center;">
+                {% if assessment.attainmentActive == 'Y' and assessment.attainmentValue is not empty %}
+                    {{ assessment.attainmentValue|default('N/A') }}
+                    {% if config.includeAverage == 'Y' and cycleNum == reportingCycle.cycleNumber %}
+                        {% set cleanValue = assessment.attainmentValue|replace({'%':''})|trim %}
+                        {% if cleanValue matches '/^\\d+\\.?\\d*$/' %}
+                            {# Debug output for each value #}
+                            <div class="debug-output">
+                                Course: {{ course }}<br>
+                                Original Value: {{ assessment.attainmentValue }}<br>
+                                Cleaned Value: {{ cleanValue }}<br>
+                                Adding to Total Array...
+                            </div>
+                            {# Convert to numeric value using multiplication by 1 #}
+                            {% set numericValue = cleanValue * 1 %}
+                            {% set _ = totalArray.update({ (course): numericValue }) %}
+                        {% else %}
+                            <div class="debug-output">
+                                Course: {{ course }}<br>
+                                Invalid Value: {{ cleanValue }}<br>
+                                Skipping...
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
+            <td style="text-align: center;">{{ assessment.effortValue|default('N/A') }}</td>
+        {% endfor %}
+    </tr>
+
+    {# Current Cycle Comments Section #}
+    {% set currentCycleName = reportingCycle.cycles[reportingCycle.cycleNumber] %}
+    {% set currentAssessment = {} %}
+    {% for assessmentName, assessmentData in assessments %}
+        {% if assessmentData.name|trim|lower == currentCycleName|trim|lower %}
+            {% set currentAssessment = assessmentData %}
+        {% endif %}
+    {% endfor %}
+    {% if currentAssessment is not empty %}
+    <tr class="comment-row">
+        <td colspan="{{ (reportingCycle.cycleTotal * 2) + 1 }}">
+            <strong>Teacher(s):</strong> 
+            {{ currentAssessment.teacherName|default('N/A') }}
+            
+            {% if currentAssessment.comment != 'N' and currentAssessment.comment is not empty %}
+                <br><strong>Comment:</strong> <em>{{ currentAssessment.comment }}</em>
+            {% endif %}
+        </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+
+    {# Cycle-Specific Average Section #}
+    {% if config.includeAverage == 'Y' %}
+    <tr class="average-cell">
+        <td colspan="{{ (reportingCycle.cycleTotal * 2) + 1 }}">
+            <strong>{{ reportingCycle.cycles[reportingCycle.cycleNumber] }} Average:</strong>
+            {% set total = 0 %}
+            {% set count = 0 %}
+            {% for course, value in totalArray %}
+                {# Ensure value is numeric #}
+                {% set numericValue = value * 1 %}
+                {% if numericValue is not empty and numericValue >= 0 %}
+                    {% set total = total + numericValue %}
+                    {% set count = count + 1 %}
+                    {# Debug output for each course #}
+                    <div class="debug-output">
+                        Course: {{ course }}<br>
+                        Value: {{ numericValue }}<br>
+                        Running Total: {{ total }}<br>
+                        Count: {{ count }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% if count > 0 %}
+                <div class="debug-output">
+                    Final Total: {{ total }}<br>
+                    Final Count: {{ count }}<br>
+                    Calculated Average: {{ (total / count)|round(1) }}%
+                </div>
+                {{ (total / count)|round(1) }}% 
+                <small>(Average of {{ count }} subjects)</small>
+            {% else %}
+                N/A
+            {% endif %}
+        </td>
+    </tr>
+    {% endif %}
+</table>

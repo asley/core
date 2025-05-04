@@ -1,0 +1,41 @@
+{#<!—
+name: Report Card
+category: School Reports
+types: Body,Header,Footer
+icon: report-card.svg
+config:
+  - field: studentName
+    label: "Student Name"
+    type: text
+    default: ""
+  - field: grade
+    label: "Grade"
+    type: select
+    options: [A, B, C, D, E, F]
+    default: A
+#}
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .header { text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
+        .footer { text-align: center; font-size: 10px; margin-top: 20px; }
+        .content { margin: 0 auto; width: 80%; border: 1px solid #ccc; padding: 20px; }
+        .grade { font-size: 18px; font-weight: bold; color: green; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Report Card</h1>
+        <h2>{{ studentName }}</h2>
+    </div>
+    <div class="content">
+        <p>Grade: <span class="grade">{{ grade }}</span></p>
+        <p>Comments: {{ comments }}</p>
+    </div>
+    <div class="footer">
+        <p>Generated on {{ "now"|date("d-m-Y") }}</p>
+    </div>
+</body>
+</html>

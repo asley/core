@@ -1,0 +1,292 @@
+{#<!--
+name: Merge
+category: Student Data
+types: Body
+sources:
+    student: Student
+    internalAssessmentByCourse: InternalAssessmentByCourse
+    reportingCycle: ReportingCycle
+config:
+-->#}
+{# Student Report Template: Internal and Markbook Grades #}
+{#{{- stylesheet ? include(stylesheet) -}}#}
+
+{# Student Report Template: Internal Assessment and Markbook #}
+{{- stylesheet ? include(stylesheet) -}}
+
+<div class="student-report">
+    <h1>{{ __('Student Report') }}</h1>
+    <h2>{{ student.firstName }} {{ student.surname }}</h2>
+    <p><strong>{{ __('Form Group:') }}</strong> {{ student.formGroupName }}</p>
+    <p><strong>{{ __('Tutor:') }}</strong> {{ student.tutorName }}</p>
+    <hr>
+
+    {# Internal Assessment Section #}
+    <h2>{{ __('Internal Assessment Data') }}</h2>
+    <table class="w-full table" cellspacing="0" cellpadding="10" nobr="true">
+        <thead>
+            <tr>
+                <th class="header bg-primary border">{{ __('Course Name') }}</th>
+                <th class="header bg-primary border">{{ __('Assessment Name') }}</th>
+                <th class="header bg-primary border">{{ __('Attainment') }}</th>
+                <th class="header bg-primary border">{{ __('Effort') }}</th>
+                <th class="header bg-primary border">{{ __('Comments') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% set internalTotal = 0 %}
+            {% set internalCount = 0 %}
+            {% for courseID, courseData in internalAssessmentByCourse.courses %}
+    {% for assessmentName, assessment in courseData %}
+        <tr>
+            {% if loop.first %}
+                <td rowspan="{{ courseData|length }}" class="border">{{ assessment.courseName }}</td>
+            {% endif %}
+            <td class="border">{{ assessment.name }}</td>
+            <td class="border">{{ assessment.attainmentValue|default('N/A') }}</td>
+            <td class="border">{{ assessment.effortValue|default('N/A') }}</td>
+            <td class="border">{{ assessment.comment|default('No comments provided.') }}</td>
+            
+            {% if assessment.attainmentValue is defined and assessment.attainmentValue|default('') != '' %}
+                {% set numericValue = assessment.attainmentValue|replace({'%': ''}) %}
+                {% if numericValue matches('/^\d+(\.\d+)?$/') %}
+                    {% set internalTotal = internalTotal + numericValue|default(0) %}
+                    {% set internalCount = internalCount + 1 %}
+                {% endif %}
+            {% endif %}
+        </tr>
+    {% endfor %}
+{% endfor %}
+
+                <tr>
+                    <td colspan="5" class="border text-center">{{ __('No internal assessment data available.') }}</td>
+                </tr>
+        
+        </tbody>
+    </table>
+
+    <p><strong>{{ __('Internal Assessment Average:') }}</strong> 
+        {{ internalCount > 0 ? (internalTotal / internalCount)|round(2) : 'N/A' }}
+    </p>
+    <hr>
+
+    {# Markbook Section #}
+    <h2>{{ __('Markbook Data') }}</h2>
+    <table class="w-full table" cellspacing="0" cellpadding="10" nobr="true">
+        <thead>
+            <tr>
+                <th class="header bg-primary border">{{ __('Course Name') }}</th>
+                <th class="header bg-primary border">{{ __('Markbook Column') }}</th>
+                <th class="header bg-primary border">{{ __('Attainment') }}</th>
+                <th class="header bg-primary border">{{ __('Effort') }}</th>
+                <th class="header bg-primary border">{{ __('Comments') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set markbookTotal = 0 %}
+            {% set markbookCount = 0 %}
+            {% for course in markbookEntry %}
+                {% for column in course.columns %}
+                    <tr>
+                        {% if loop.first %}
+                            <td rowspan="{{ course.columns|length }}" class="border">{{ course.courseName }}</td>
+                        {% endif %}
+                        <td class="border">{{ column.name }}</td>
+                        <td class="border">{{ column.attainmentValueRaw|default('N/A') }}</td>
+                        <td class="border">{{ column.effortValue|default('N/A') }}</td>
+                        <td class="border">{{ column.comment|default('No comments provided.') }}</td>
+
+                        {% if column.attainmentValueRaw is defined and column.attainmentValueRaw|default('') != '' %}
+                            {% set numericValue = column.attainmentValueRaw|replace({'%': ''}) %}
+                            {% if numericValue matches('/^\d+(\.\d+)?$/') %}
+                                {% set markbookTotal = markbookTotal + numericValue|default(0) %}
+                                {% set markbookCount = markbookCount + 1 %}
+                            {% endif %}
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+{% endfor %}
+                <tr>
+                    <td colspan="5" class="border text-center">{{ __('No markbook data available.') }}</td>
+                </tr>
+        </tbody>
+    </table>
+
+    <p><strong>{{ __('Markbook Average:') }}</strong> 
+        {{ markbookCount > 0 ? (markbookTotal / markbookCount)|round(2) : 'N/A' }}
+    </p>
+    <hr>
+
+    {# Overall Average Section #}
+    <table>
+        <thead>
+            <tr>
+                <th>Course Name</th>
+                <th>Assessment Name</th>
+                <th>Attainment</th>
+                <th>Effort</th>
+                <th>Comments</th>
+                <th>Teacher(s)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for courseID, courseData in courseCriteriaByCycle %}
+            <tr>
+                <td>{{ courseData.courseName }}</td>
+                <td>December 2024 Exam</td>
+                <td>{{ courseData.perStudent['Percentage Grade'].values[reportingCycle.name].value|default('N/A') }}</td>
+                <td>{{ courseData.perStudent['Effort'].values[reportingCycle.name].value|default('N/A') }}</td>
+                <td>{{ courseData.perStudent['Comments'].values[reportingCycle.name].value|default('N/A') }}</td>
+                <td>
+                    {% for teacher in courseData.teachers %}
+                        {{ teacher.fullName }}{% if not loop.last %}, {% endif %}
+                    {% else %}
+                        N/A
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Calculate and Display Overall Average -->
+    {% set total = 0 %}
+    {% set count = 0 %}
+    
+    {% for courseID, courseData in courseCriteriaByCycle %}
+        {% for criteriaName, criteria in courseData.perStudent %}
+            {% if criteria.values[reportingCycle.name].value is defined %}
+                {% set numericValue = criteria.values[reportingCycle.name].value|replace({'%': ''}) %}
+                {% if numericValue matches('/^\d+(\.\d+)?$/') %}
+                    {% set total = total + numericValue|default(0) %}
+                    {% set count = count + 1 %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+    
+    <div>
+        {% if count > 0 %}
+            <strong>Overall Average:</strong> {{ (total / count)|number_format(2) }}%
+        {% else %}
+            <strong>Overall Average:</strong> N/A
+        {% endif %}
+    </div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {#
+    {% set total = 0 %}
+    {% set count = 0 %}
+    
+    {% for courseID, courseData in courseCriteriaByCycle %}
+        <tr>
+            <td>{{ courseData.courseName }}</td>
+            {% for criteriaName, criteria in courseData.perStudent %}
+                {% if criteria.values[reportingCycle.name].value is defined %}
+                    {% set numericValue = criteria.values[reportingCycle.name].value|replace({'%': ''}) %}
+                    {% if numericValue|default('') matches('/^\d+(\.\d+)?$/') %}
+                        {% set total = total + numericValue|default(0) %}
+                        {% set count = count + 1 %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    
+    <div>
+        {% if count > 0 %}
+            <strong>Overall Average:</strong> {{ (total / count)|number_format(2) }}%
+        {% else %}
+            <strong>Overall Average:</strong> N/A
+        {% endif %}
+    </div>
+    #}
+
+
+
+
+
+
+
+
+{#
+
+    {% set total = 0 %}
+{% set count = 0 %}
+
+{% for courseID, courseData in courseCriteriaByCycle %}
+    {% for criteriaName, criteria in courseData.perStudent %}
+        {% if criteria.values[reportingCycle.name].value is defined %}
+        {% set numericValue = criteria.values[reportingCycle.name].value|replace({'%': ''}) %}
+        {% if numericValue|default('') matches('/^\d+(\.\d+)?$/') %}
+            {% set total = total + numericValue|default(0) %}
+        {% endif %}
+        
+                {% set count = count + 1 %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+<div>
+    {% if count > 0 %}
+        <strong>Overall Average:</strong> {{ (total / count)|number_format(2) }}%
+    {% else %}
+        <strong>Overall Average:</strong> N/A
+    {% endif %}
+</div>
+
+ #}  
+   
+   
+   
+   
+   
+   
+   {#
+    {% set total = 0 %}
+    {% set count = 0 %}
+    
+    {% for courseID, courseData in courseCriteriaByCycle %}
+        {% for criteriaName, criteria in courseData.perStudent %}
+            {% if criteria.values[reportingCycle.name].value is defined %}
+                {% set numericValue = criteria.values[reportingCycle.name].value|replace({'%': ''}) %}
+                {% if numericValue|default('') matches('/^\d+(\.\d+)?$/') %}
+                    {% set total = total + numericValue|float %}
+                    {% set count = count + 1 %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+    
+    <div>
+        {% if count > 0 %}
+            <strong>Overall Average:</strong> {{ (total / count)|number_format(2) }}%
+        {% else %}
+            <strong>Overall Average:</strong> N/A
+        {% endif %}
+    </div>
+    
+   #} 
+
+    
+</div>

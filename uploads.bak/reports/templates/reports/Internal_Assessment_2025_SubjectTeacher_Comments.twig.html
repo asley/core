@@ -1,0 +1,144 @@
+{#<!--
+name: Internal_Assessment_2025_SubjectTeacher_Comments
+category: Student Data
+types: Body
+sources:
+    student: Student
+    internalAssessmentByCourse: InternalAssessmentByCourse
+    reportingCycle: ReportingCycle
+config:
+    includeAverage:
+        label: Include Average Attainment?
+        type: yesno
+        default: Y
+    limitByReportingCycle:
+        label: Limit Columns by Reporting Cycle?
+        type: yesno
+        default: N
+-->#}
+
+{{- stylesheet ? include(stylesheet) -}}
+
+{# ✅ Debugging: Print JSON Data for Verification (Uncomment if needed) #}
+{# <pre>{{ internalAssessmentByCourse|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre> #}
+
+<table class="table table-striped" cellspacing="0" cellpadding="3" nobr="true" style="font-size: 9px;">
+    {# 🔹 Table Header Row: Cycle Names & Subjects #}
+    <tr>
+        <td class="header bg-primary border-top border-bottom border-left border-right">
+            {{ __('Subjects') }}
+        </td>
+
+        {# ✅ Iterate through all cycles and add headers dynamically #}
+        {% for cycleNum in range(1, reportingCycle.cycleTotal|default(1)) %}
+            {% set cycleName = reportingCycle.cycles[cycleNum]|default('N/A') %}
+            <td class="header bg-primary border-top border-bottom border-left border-right text-center">
+                {{ cycleName }} - Grade
+            </td>
+            <td class="header bg-primary border-top border-bottom border-left border-right text-center">
+                {{ cycleName }} - Effort
+            </td>
+        {% endfor %}
+    </tr>
+
+    {# 🔹 Iterate Through Each Course and Display Data for All Cycles #}
+    {% for course, assessments in internalAssessmentByCourse.courses %}
+    <tr>
+        <td class="border-top border-bottom border-left" style="font-weight: bold;">
+            {{ course }}
+        </td>
+
+        {# ✅ Iterate through cycles to display grades & effort #}
+        {% for cycleNum in range(1, reportingCycle.cycleTotal|default(1)) %}
+            {% set cycleName = reportingCycle.cycles[cycleNum]|default('N/A') %}
+            {% set matchingAssessment = assessments|keys|filter(a => a starts with cycleName)|first %}
+            {% set cycleAssessment = matchingAssessment is defined ? assessments[matchingAssessment] : {} %}
+
+            {# ✅ Debugging: Print selected assessment for the cycle (Uncomment if needed) #}
+            {# <pre>{{ "Cycle: " ~ cycleName ~ " -> Matching Assessment: " ~ matchingAssessment }}</pre> #}
+
+            {# ✅ Display Grade #}
+            <td class="border-top border-bottom border-left text-center">
+                {{ cycleAssessment.attainmentDescriptor is defined and cycleAssessment.attainmentDescriptor is not empty
+                    ? cycleAssessment.attainmentDescriptor
+                    : (cycleAssessment.attainmentValue is defined and cycleAssessment.attainmentValue is not empty
+                        ? cycleAssessment.attainmentValue
+                        : 'N/A') }}
+            </td>
+
+            {# ✅ Display Effort #}
+            <td class="border-top border-bottom border-left border-right text-center">
+                {{ cycleAssessment.effortDescriptor is defined and cycleAssessment.effortDescriptor is not empty
+                    ? cycleAssessment.effortDescriptor
+                    : (cycleAssessment.effortValue is defined and cycleAssessment.effortValue is not empty
+                        ? cycleAssessment.effortValue
+                        : 'N/A') }}
+            </td>
+        {% endfor %}
+    </tr>
+
+    {# 🔹 Row for displaying Teacher Comments for each cycle #}
+    {% for cycleNum in range(1, reportingCycle.cycleTotal|default(1)) %}
+        {% set cycleName = reportingCycle.cycles[cycleNum]|default('N/A') %}
+        {% set matchingAssessment = assessments|keys|filter(a => a starts with cycleName)|first %}
+        {% set cycleAssessment = matchingAssessment is defined ? assessments[matchingAssessment] : {} %}
+
+        {% if cycleAssessment.comment is defined and cycleAssessment.comment is not empty %}
+        <tr>
+            <td class="border-bottom border-left border-right bg-light text-sm" colspan="{{ (reportingCycle.cycleTotal * 2) + 1 }}" style="font-size: 8px; padding: 2px;">
+                <i>{{ cycleAssessment.comment }}</i>
+                <br>
+                <span style="font-size: 7px; font-weight: bold; display: inline-block; width: 50%;">
+                    {{ cycleAssessment.teacherName is defined and cycleAssessment.teacherName is not empty 
+                        ? cycleAssessment.teacherName 
+                        : 'N/A' }}
+                </span>
+            </td>
+        </tr>
+        {% endif %}
+    {% endfor %}
+
+    {% endfor %}
+    
+    {# ✅ Display Average Scores (If Configured) #}
+    {% if config.includeAverage == 'Y' %}
+    <tr>
+        <td class="header bg-primary border-top border-bottom border-left border-right text-center" style="font-weight: bold;">
+            {{ __('Average') }}
+        </td>
+
+        {# Initialize Total Variables #}
+        {% set totalAttainmentSum = 0 %}
+        {% set totalAttainmentCount = 0 %}
+
+        {# Iterate Over Cycles #}
+        {% for cycleNum in range(1, reportingCycle.cycleTotal|default(1)) %}
+            {% set cycleName = reportingCycle.cycles[cycleNum]|default('N/A') %}
+            {% set cycleTotal = 0 %}
+            {% set cycleCount = 0 %}
+
+            {# Calculate Total for Each Course #}
+            {% for course, assessments in internalAssessmentByCourse.courses %}
+                {% set matchingAssessment = assessments|keys|filter(a => a starts with cycleName)|first %}
+                {% set cycleAssessment = matchingAssessment is defined ? assessments[matchingAssessment] : {} %}
+                {% if cycleAssessment.attainmentValue is defined and cycleAssessment.attainmentValue is not empty %}
+                    {% set cleanedValue = cycleAssessment.attainmentValue|replace({'%': ''})|trim %}
+                    {% set numericValue = cleanedValue|default(0) * 1 %}
+                    {% set cycleTotal = cycleTotal + numericValue %}
+                    {% set cycleCount = cycleCount + 1 %}
+                {% endif %}
+            {% endfor %}
+
+            {# ✅ Display Average Attainment #}
+            <td class="header bg-primary border-top border-bottom border-left border-right text-center">
+                {% if cycleCount > 0 %}
+                    {{ (cycleTotal / cycleCount)|round(1) }}%
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
+            <td class="header bg-primary border-top border-bottom border-left border-right text-center">N/A</td>
+        {% endfor %}
+    </tr>
+    {% endif %}
+</table>

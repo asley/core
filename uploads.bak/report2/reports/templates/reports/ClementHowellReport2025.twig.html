@@ -1,0 +1,332 @@
+{#<!--
+name: Final Report 2025-A.Smith
+category: Cycle Template
+types: Body
+sources:
+    student: Student
+    reportingCycle: ReportingCycle
+    courseCriteriaByCycle: CourseCriteriaByCycle
+-->#}
+
+
+{{- stylesheet ? include(stylesheet) -}}
+
+
+
+{% for course in courseCriteriaByCycle %}
+
+<table class="w-full table" cellspacing="0" cellpadding="4" nobr="true">
+    <tr>
+        <td colspan="{{ course.perStudent | length + 1 }}" class="header bg-primary border">
+            {{ course.courseName }}
+        </td>
+        <td style="text-align: right;">
+            {% for teacher in course.teachers %}
+                {{ teacher.fullName }}{{ not loop.last ? ', ' : '' }}
+            {% endfor %}
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="subheader border">Mark Sheet</td>
+        {% for criteria in course.perStudent %}
+            {% if criteria.valueType != 'Comment' %}
+                <td class="subheader border">{{ criteria.criteriaName }}</td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+
+    {% for cycleNum in range(1, reportingCycle.cycleTotal|default(1)) %}
+    <tr class="cycle-row">
+        {% set cycleName = reportingCycle.cycles[cycleNum] %}
+        <td class="border">Marksheet {{ cycleNum }}</td>
+        {% for criteria in course.perStudent %}
+            {% if criteria.valueType != 'Comment' %}
+            <td class="border">
+                {% set value = criteria.values[cycleName].descriptor ?? criteria.values[cycleName].value|default('') %}
+                {% set sanitizedValue = value|replace({'%': ''})|trim %}
+                {{ sanitizedValue matches '/^-?\\d+(\\.\\d+)?$/' ? sanitizedValue ~ '%' : value }}
+            </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+
+    {% if course.hasComments %}
+    <tr>
+        <td colspan="{{ course.perStudent | length + 1 }}" class="border bg-secondary" style="font-size: 90%; text-align: left;">
+            {% for criteria in course.perStudent %}
+                {% if criteria.valueType == 'Comment' %}
+                    {{ criteria.values[cycleName].descriptor ?? criteria.values[cycleName].value | default('No comments available.') }}
+                {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+    {% endif %}
+</table>
+
+<div class="course-divider"></div> <!-- Divider between courses -->
+
+{% endfor %}
+
+{# OverAll Average Calculations #}
+
+
+
+{% set overallGradeCount = 0 %}
+{% set courseCount = 0 %} {# To count courses with valid grades #}
+{% set overallAverage = 0 %}
+{% set overallTotalGrades = 0 %}
+
+{# Get the current cycle name #}
+{% set currentCycleName = reportingCycle.cycles[reportingCycle.cycleNumber]|default('') %} 
+{% set courseCount = 0 %} {# Initialize course count #}
+
+{# Iterate over courses for the current cycle only #}
+{% for course in courseCriteriaByCycle %}
+    {% set courseTotalGrades = 0 %}
+    {% set courseGradeCount = 0 %}
+
+    
+    
+    
+    {# Iterate over cycles #}
+    {# {% for cycleNum in range(1, reportingCycle.cycleTotal|default(1)) %}
+    {% set cycleName = reportingCycle.cycles[cycleNum]|default('') %}  #}
+        
+         {# Check each criteria #}
+        {# {% if cycleName is not empty %}
+        {% for criteria in course.perStudent| default([]) %}
+        {% if criteria.valueType != 'Comment' %}
+        {# Extract and sanitize the grade value #}
+        {# {% set rawGrade = criteria.values[cycleName].value|default('') %}
+        {% set sanitizedGrade = rawGrade|replace({'%': ''})|trim %} #} 
+
+
+        {# Check each criteria for the current cycle #}
+            {% for criteria in course.perStudent %} 
+            {% if criteria.valueType != 'Comment' %} 
+            {# Extract and sanitize the grade value #}
+            {% set rawGrade = criteria.values[currentCycleName].value|default('') %}
+            {% set sanitizedGrade = rawGrade|replace({'%': ''})|trim %} 
+
+    {# Consider only the current cycle #}
+    {# {% set cycleName = reportingCycle.current|default('') %}
+    {% if cycleName is not empty %}
+    {# Iterate over per-student criteria #}
+    {# {% for criteria in course.perStudent|default([]) %}
+    {# {% if criteria.valueType != 'Comment' %} #}
+    {# Extract and sanitize the grade value #}
+    {# {% set rawGrade = criteria.values[cycleName].value|default('') %}
+    {% set sanitizedGrade = rawGrade|replace({'%': ''})|trim %} #}
+
+
+                
+                {# Check if sanitized grade is numeric #}
+                {% if sanitizedGrade is not empty and (sanitizedGrade matches '/^-?\\d+(\\.\\d+)?$/') %}
+                    {% set grade = sanitizedGrade + 0 %}
+                    {# {% if sanitizedGrade matches '/^\\d+(\\.\\d+)?$/' %}
+                    {% set grade = sanitizedGrade|int %} #}
+                    {# {% set grade = sanitizedGrade|number_format(0) %} #}
+                    {% set courseTotalGrades = courseTotalGrades + grade %}
+                    {% set courseGradeCount = courseGradeCount + 1 %}
+                {% endif %}
+            {% endif %}
+            {% endfor %}
+
+    {# Update overall totals #}
+    {# {% set overallTotalGrades = overallTotalGrades + courseTotalGrades %} #}
+    {# {% set overallGradeCount = overallGradeCount + courseGradeCount %} #}
+    
+
+
+{# Update overall totals only if there are grades for this course in the current cycle #}
+
+{% if courseGradeCount > 0 %}
+{% set overallTotalGrades = overallTotalGrades + courseTotalGrades %}
+{% set overallGradeCount = overallGradeCount + courseGradeCount %}
+{% set courseCount = courseCount + 1 %} {# Increment course count #}
+{% endif %} 
+{% endfor %} 
+
+
+
+{# Calculate the overall average grade  #}
+{% set overallAverage = overallGradeCount > 0 ? (overallTotalGrades / courseCount )|round(2): 'N/A' %}
+
+
+{# Display results #}
+<table class="w-full table" cellspacing="0" cellpadding="4" nobr="true">
+    <tr>
+        <td class="header bg-primary border">Overall Average</td>
+        <td class="border bg-secondary">{{ overallAverage ~ '%'}}</td>
+        
+    </tr>
+    <tr>
+        <td class="header bg-primary border">Total Subjects</td>
+        <td class="border bg-secondary">{{ courseCount }}</td>
+    </tr>
+
+
+</table>
+
+<div class="course-divider"></div> <!-- Divider between courses -->
+{# 
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin: 20px 0;">
+    <table class="table academic-scale" cellspacing="0" cellpadding="10" nobr="true" style="flex: 1; margin-right: 10px; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th colspan="3" class="header bg-primary border text-center">ACADEMIC SCALE</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="border" style="text-align: center;">A</td>
+                <td class="border" style="text-align: center;">85% - 100%</td>
+                <td class="border" style="text-align: center;">Excellent</td>
+            </tr>
+            <tr>
+                <td class="border" style="text-align: center;">B</td>
+                <td class="border" style="text-align: center;">70% - 84%</td>
+                <td class="border" style="text-align: center;">Very Good</td>
+            </tr>
+            <tr>
+                <td class="border" style="text-align: center;">C</td>
+                <td class="border" style="text-align: center;">60% - 69%</td>
+                <td class="border" style="text-align: center;">Good</td>
+            </tr>
+            <tr>
+                <td class="border" style="text-align: center;">D</td>
+                <td class="border" style="text-align: center;">50% - 59%</td>
+                <td class="border" style="text-align: center;">Fair</td>
+            </tr>
+            <tr>
+                <td class="border" style="text-align: center;">E</td>
+                <td class="border" style="text-align: center;">40% - 49%</td>
+                <td class="border" style="text-align: center;">Poor</td>
+            </tr>
+            <tr>
+                <td class="border" style="text-align: center;">F</td>
+                <td class="border" style="text-align: center;">Below 40%</td>
+                <td class="border" style="text-align: center;">Very Poor</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="table personality-scale" cellspacing="0" cellpadding="10" nobr="true" style="flex: 1; margin-left: 10px; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th colspan="3" class="header bg-primary border text-center">PERSONALITY & CONDUCT RATING KEY</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="border" style="text-align: center;">EX</td>
+                <td class="border" style="text-align: center;">Excellent</td>
+                <td class="border" style="text-align: center;">7</td>
+            </tr>
+            <tr>
+                <td class="border" style="text-align: center;">VG</td>
+                <td class="border" style="text-align: center;">Very Good</td>
+                <td class="border" style="text-align: center;">6</td>
+            </tr>
+            <tr>
+                <td class="border" style="text-align: center;">G</td>
+                <td class="border" style="text-align: center;">Good</td>
+                <td class="border" style="text-align: center;">5</td>
+            </tr>
+            <tr>
+                <td class="border" style="text-align: center;">F</td>
+                <td class="border" style="text-align: center;">Fair</td>
+                <td class="border" style="text-align: center;">4</td>
+            </tr>
+            <tr>
+                <td class="border" style="text-align: center;">S</td>
+                <td class="border" style="text-align: center;">Satisfactory</td>
+                <td class="border" style="text-align: center;">3</td>
+            </tr>
+            <tr>
+                <td class="border" style="text-align: center;">U</td>
+                <td class="border" style="text-align: center;">Unsatisfactory</td>
+                <td class="border" style="text-align: center;">2</td>
+            </tr>
+            <tr>
+                <td class="border" style="text-align: center;">P</td>
+                <td class="border" style="text-align: center;">Poor</td>
+                <td class="border" style="text-align: center;">1</td>
+            </tr>
+        </tbody>
+    </table>
+</div> #}
+
+
+
+{# 
+    {% for course in courseCriteriaByCycle %}
+<table class="w-full table" cellspacing="0" cellpadding="4" nobr="true">
+    <tr>
+        <td colspan="{{ course.perStudent | length + 1 }}" class="header bg-primary border">
+            {{ course.courseName }}
+        </td>
+        <td style="text-align: right;">
+            {% for teacher in course.teachers %}
+                {{ teacher.fullName }}{{ not loop.last ? ', ' : '' }}
+            {% endfor %}
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="subheader border">Cycle</td>
+        {% for criteria in course.perStudent %}
+            {% if criteria.valueType != 'Comment' %}
+                <td class="subheader border">{{ criteria.criteriaName }}</td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+
+    {% set total = 0 %}
+    {% set count = 0 %}
+    {% for cycleNum in range(1, reportingCycle.cycleTotal|default(1)) %}
+    <tr class="cycle-row">
+        {% set cycleName = reportingCycle.cycles[cycleNum] %}
+        <td class="border">Cycle {{ cycleNum }}</td>
+        {% for criteria in course.perStudent %}
+            {% if criteria.valueType != 'Comment' %}
+                <td class="border">
+                    {% set value = criteria.values[cycleName].value | replace({'%': ''}) | default('N/A') %}
+                    {{ value != 'N/A' ? value : 'N/A' }}
+    
+                    {% if value is defined and value|default('') matches('/^\\d+(\\.\\d+)?$/') %}
+                        {% set total = total + value|default(0)%}
+                        {% set count = count + 1 %}
+                    {% endif %}
+                </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}    
+
+    {% if count > 0 %}
+    <tr>
+        <td colspan="2" class="border"><strong>{{ __('Average') }}</strong></td>
+        <td class="border" colspan="{{ course.perStudent | length - 1 }}">
+            {{ (total / count) | round(2) }}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if course.hasComments %}
+    <tr>
+        <td colspan="{{ course.perStudent | length + 1 }}" class="border bg-secondary" style="font-size: 90%; text-align: left;">
+            {% for criteria in course.perStudent %}
+                {% if criteria.valueType == 'Comment' %}
+                    {{ criteria.values[cycleName].descriptor ?? criteria.values[cycleName].value | default('No comments available.') }}
+                {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+    {% endif %}
+</table>
+
+<div class="course-divider"></div> <!-- Divider between courses -->
+ #}

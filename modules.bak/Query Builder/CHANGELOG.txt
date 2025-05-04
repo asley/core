@@ -1,0 +1,346 @@
+CHANGELOG
+=========
+v2.2.00
+-------
+Gibbon v28 Compatibility
+
+v2.1.02
+-------
+Fixed JS bug introduced in ownership transfer
+
+v2.1.01
+-------
+Fixed CSS bug introduced in last version
+
+v2.1.00
+-------
+Transferred ownership from Ross Parker to Gibbon Foundation
+
+v2.0.11
+-------
+Adjusted query execution to allow "count" as a column name
+
+v2.0.10
+-------
+Fixed access check when editing Personal queries
+
+v2.0.09
+-------
+Added ability to set gibbonedu.com queries and commands to inactive
+
+v2.0.08
+-------
+Fix column count limited by row count
+
+v2.0.07
+-------
+Fix errors in SQL not caught and displayed in Run Query
+
+v2.0.06
+-------
+Added Row Limit setting
+Added memory usage output below query
+
+v2.0.05
+--------
+Refactoring of linkTop divs
+
+v2.0.04
+--------
+Removed deprecated function calls
+
+v2.0.03
+--------
+Added a CHANGEDB entry to update gibbonFormGroup references in queries
+
+v2.0.02
+--------
+Added a dry run option to Run Command
+v2.0.02
+--------
+Added a dry run option to Run Command
+
+v2.0.01
+--------
+Removed the v23 requirement
+Changed the icon for favourite queries/commands
+
+v2.0.00
+--------
+Added an option to run Commands, which can update or delete records in the database
+Added the option to favourite queries and commands so they show at the top of the list
+Added translation support
+
+v1.13.09
+--------
+Refactored session variables and null coalesce
+
+v1.13.08
+--------
+Improved additional module sync
+Increase memory limit to 512MB
+
+v1.13.07
+--------
+Fixed PHP error when adding new queries
+
+v1.13.06
+--------
+Fixed post-v1.13.00 clean install issue
+
+v1.13.05
+--------
+Fixed queries sync not working with special characters in the organisation name
+
+v1.13.04
+--------
+Fix access to the Save Query checkbox for users with edit permission
+Add a check all/none option for year group checkboxes
+
+v1.13.03
+--------
+Added expandable list of users to access section of Run Query page
+
+v1.13.02
+--------
+Less aggressive license checking
+
+v1.13.01
+--------
+Display access requirements on the Run Query page
+
+v1.13.00
+--------
+Enabled limiting access to queries based on use permissions
+
+v1.12.00
+--------
+Added SQL autocompletion to the editor
+
+v1.11.00
+--------
+Added table filtering in Help modal
+
+v1.10.02
+--------
+Improved Export action
+
+v1.10.01
+--------
+Improved table actions
+
+v1.10.00
+--------
+Improved query syncing
+
+v1.9.01
+-------
+Fixed scope saving issue
+Fixed broken Help button in Query Add and Edit
+Improved typography on help page
+
+v1.9.00
+-------
+Added additional module queries
+Fixed Manage Queries Delete logic
+
+v1.8.00
+-------
+Allow users with Manage Queries_viewEditAll to edit School queries
+Implement CodeEditor field, remove QueryEditor and lib folder
+Prevent stripping line breaks when saving queries
+
+v1.7.05
+-------
+Removed errant pipe
+
+v1.7.04
+-------
+Add a year group checkbox variable type
+Fix variables missing after duplicating a query
+
+v1.7.03
+-------
+Fix variables missing during export
+
+v1.7.02
+-------
+Add variables to the Add Query page.
+Add variables to gibbonedu.com sync.
+Disable Edit link for gibbonedu.com queries.
+
+v1.7.01
+-------
+Links from Edit to Run, and Run to Edit.
+More useful error messages.
+
+v1.7.00
+-------
+Add the ability to use variables in queries
+
+v1.6.04
+-------
+Memory limit increase
+Visual tweaks
+
+v1.6.03
+-------
+v18 Compatibility
+
+v1.6.02
+-------
+Switch from support@gibbonedu.org to http://gibbonedu.com
+
+v1.6.01
+-------
+Minor fixes to breadcrumbs
+
+v1.6.00
+-------
+Refactor breadcrumbs and update class namespaces
+Requires Gibbon v17.0.00+
+
+v1.5.03
+-------
+Add an error message for incorrect SQL syntax
+
+v1.5.02
+-------
+Fix query search issue
+
+v1.5.01
+-------
+Add a permission level for users to run queries but not add or edit them
+
+v1.5.00
+-------
+Add settings to select default export file type
+Update the export script to use PHPExcel class
+
+v1.4.01
+-------
+Query validation fix
+
+v1.4.00
+-------
+Updated default database storage engine to InnoDB
+
+v1.3.00
+-------
+Object oriented rewrite and code cleanup
+
+v1.2.17
+-------
+Security fix (courtesy of Urko Masse)
+
+v1.2.16
+-------
+Fixed empty export issue
+
+v1.2.15
+-------
+Exempted fields called "image_240" from auto-field-shortening
+
+v1.2.14
+-------
+Exempted fields called "image" from auto-field-shortening
+
+v1.2.13
+-------
+Fixed indentation in beautified PHP code
+
+v1.2.12
+-------
+Beautified PHP code
+Improved error handling
+Edit link added to add return
+
+v1.2.11
+-------
+Fixed lib bug introduced in v1.2.10
+
+v1.2.10
+-------
+Gibbon Core v12 & PHP 7 Compatibility
+
+v1.2.09
+-------
+Added protection against exporting contract data from staff section (coming in Core v12)
+
+v1.2.08
+-------
+Fixed export bug affecting School queries (again!)
+
+v1.2.07
+-------
+Fixed export bug affecting School queries
+
+v1.2.06
+-------
+Fixed OTT gibbonedu.com query deletion
+
+v1.2.05
+-------
+Added category auto suggest in edit/add mode
+Fixed duplicate bug
+
+v1.2.04
+-------
+Sub folder tweak
+
+v1.2.03
+-------
+Fixed bug which deletes school wide queries on failed sync
+
+v1.2.02
+-------
+Fixed bug preventing viewing of school-wide shared queries
+
+v1.2.01
+-------
+Prevented "Save Query?" being used in school-wide shared queries, unless it is the owner viewing
+
+v1.2.00
+-------
+Added school-wide shared queries
+
+v1.1.00
+-------
+Added query search function
+
+v1.0.08
+-------
+Added Gibbon v8 compatibility
+
+v1.0.07
+-------
+Fixed sync issue on https hosts
+
+v1.0.06
+-------
+Fixed export content-shortening issue.
+
+v1.0.05
+-------
+Removed password related fields from queries
+
+v1.0.04
+-------
+Fixed PHP short tag issues
+
+v1.0.03
+-------
+Fixed export file name issue
+
+v1.0.02
+-------
+Fixed help issue
+
+v1.0.01
+-------
+Fixed memory leak in query export
+
+v1.0.00
+-------
+Settings for key to access gibbonedu.org queries
+Ability to access and run gibbonedu.org queries

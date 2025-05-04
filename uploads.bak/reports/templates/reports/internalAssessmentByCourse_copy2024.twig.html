@@ -1,0 +1,280 @@
+{#<!--
+name: CHHS Internal Assessment January 27
+category: Student Data
+types: Body
+sources:
+    student: Student
+    internalAssessmentByCourse: InternalAssessmentByCourse
+    reportingCycle: ReportingCycle
+config:
+    includeAverage:
+        label: Include Average Attainment?
+        type: yesno
+        default: N
+    limitByReportingCycle:
+        label: Limit Columns by Reporting Cycle?
+        type: yesno
+        default: N
+-->#}
+{{- stylesheet ? include(stylesheet) -}}
+
+{# {% set totalArray = [] %}
+{% set percentArray = [] %}
+
+{% if config.limitByReportingCycle == 'Y' %}
+    {% set allAssessments = internalAssessmentByCourse.assessments|filter(a => (a.completeDate >= reportingCycle.dateStart and a.completeDate <= reportingCycle.dateEnd) ) %}
+{% else %}
+    {% set allAssessments = internalAssessmentByCourse.assessments %}
+{% endif %}
+
+<table class="w-full table" cellspacing="0" cellpadding="10" nobr="true">
+    <tr>
+        <td class="header bg-primary border-top border-bottom border-left {{ allAssessments|length == 0 ? 'border-right' }}" rowspan="{{ allAssessments ? 2 : 1 }}">
+            {{ __('Courses') }}
+        </td>
+        {% for assessment in allAssessments %}
+            {% set colspan = assessment.attainmentActive == 'Y' and assessment.effortActive == 'Y' ? 2 : 1 %}
+            <td class="header bg-primary border-top border-bottom {{ loop.last ? 'border-right' }}" colspan="{{ colspan }}">
+                {{- assessment.name -}}
+            </td>
+        {% endfor %}
+    </tr>
+
+    <tr>
+        {% for assessment in allAssessments %}
+            {% set colspan = assessment.attainmentActive == 'Y' and assessment.effortActive == 'Y' ? 2 : 1 %}
+
+            {% if assessment.attainmentActive == 'Y' %}
+                <td class="border-top border-bottom border-left {{ loop.last and colspan == 1 ? 'border-right' }}">
+                    {{- __('Attainment') }}
+                </td>
+            {% endif %}
+
+            {% if assessment.effortActive == 'Y' %}
+                <td class="border-top border-bottom {{ colspan == 1 ? 'border-left' }} {{ loop.last ? 'border-right' }}">
+                    {{- __('Effort') }}
+                </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    
+
+    {% for course, assessments in internalAssessmentByCourse.courses %}
+    <tr>
+        <td class="border-top border-bottom border-left {{ allAssessments|length == 0 ? 'border-right' }}">
+            {{ course }}
+        </td>
+        {% for key, assessment in allAssessments %}
+            {% set colspan = assessment.attainmentActive == 'Y' and assessment.effortActive == 'Y' ? 2 : 1 %}
+
+            {% if assessment.attainmentActive == 'Y' %}
+                <td class="border-top border-bottom border-left {{ loop.last and colspan == 1 ? 'border-right' }}">
+                    {{- assessments[assessment.name].attainmentDescriptor ?? assessments[assessment.name].attainmentValue }}
+                </td>
+
+                {% set total = totalArray[assessment.name] %}
+                {% set totalArray = totalArray|merge({ (assessment.name) : total + assessments[assessment.name].attainmentValue|number_format}) %}
+                {% set percentArray = percentArray|merge({ (assessment.name) : '%' in assessments[assessment.name].attainmentValue }) %}
+            {% endif %}
+
+            {% if assessment.effortActive == 'Y' %}
+                <td class="border-top border-bottom {{ colspan == 1 ? 'border-left' }} {{ loop.last ? 'border-right' }}">
+                    {{- assessments[assessment.name].effortDescriptor ?? assessments[assessment.name].effortValue }}
+                </td>
+            {% endif %}
+        {% endfor %}
+    </tr> 
+    {% endfor %}
+
+    {% if config.includeAverage == 'Y' %}
+    <tr>
+        <td class="border-top border-bottom border-left">
+            <b>{{ __('Average') }}</b>
+        </td>
+        {% for assessment in allAssessments %}
+            {% set colspan = assessment.attainmentActive == 'Y' and assessment.effortActive == 'Y' ? 2 : 1 %}
+
+            {% if assessment.attainmentActive == 'Y' %}
+                <td class="border-top border-bottom border-left {{ loop.last and colspan == 1 ? 'border-right' }}">
+                {{- (totalArray[assessment.name] / internalAssessmentByCourse.courses|length)|round(1) }}
+
+                {%- if percentArray[assessment.name] == true -%}%{%- endif -%}
+                </td>
+            {% endif %}
+
+            {% if assessment.effortActive == 'Y' %}
+                <td class="border-top border-bottom {{ colspan == 1 ? 'border-left' }} {{ loop.last ? 'border-right' }}">
+                    &nbsp;
+                </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    {% endif %}
+</table>
+
+<br/>
+ #}
+
+
+
+
+{% set totalArray = {} %}
+{% set percentArray = {} %}
+
+{% if config.limitByReportingCycle == 'Y' %}
+    {# Filter the assessments to include only those within the reporting cycle date range #}
+    {% set allAssessments = internalAssessmentByCourse.assessments|filter(a => (a.completeDate >= reportingCycle.dateStart and a.completeDate <= reportingCycle.dateEnd)) %}
+{% else %}
+    {# Include all assessments if not limited by the reporting cycle #}
+    {% set allAssessments = internalAssessmentByCourse.assessments %}
+{% endif %}
+
+<table class="w-full table" cellspacing="0" cellpadding="10" nobr="true">
+    <tr>
+        {# Header row for the courses #}
+        <td class="header bg-primary border-top border-bottom border-left {{ allAssessments|length == 0 ? 'border-right' }}" rowspan="{{ allAssessments ? 2 : 1 }}">
+            {{ __('Courses') }}
+        </td>
+        {% for assessment in allAssessments %}
+            {# Create a column for each assessment, with appropriate colspan for attainment and effort #}
+            {% set colspan = assessment.attainmentActive == 'Y' and assessment.effortActive == 'Y' ? 2 : 1 %}
+            <td class="header bg-primary border-top border-bottom {{ loop.last ? 'border-right' }}" colspan="{{ colspan }}">
+                {{- assessment.name -}}
+            </td>
+        {% endfor %}
+    </tr>
+
+    <tr>
+        {# Secondary header row for Attainment and Effort columns #}
+        {% for assessment in allAssessments %}
+            {% set colspan = assessment.attainmentActive == 'Y' and assessment.effortActive == 'Y' ? 2 : 1 %}
+            {% if assessment.attainmentActive == 'Y' %}
+                <td class="border-top border-bottom border-left {{ loop.last and colspan == 1 ? 'border-right' }}">
+                    {{- __('Attainment') }}
+                </td>
+            {% endif %}
+            {% if assessment.effortActive == 'Y' %}
+                <td class="border-top border-bottom {{ colspan == 1 ? 'border-left' }} {{ loop.last ? 'border-right' }}">
+                    {{- __('Effort') }}
+                </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+
+    {% for course, assessments in internalAssessmentByCourse.courses %}
+    <tr>
+        {# Course name row #}
+        <td class="border-top border-bottom border-left {{ allAssessments|length == 0 ? 'border-right' }}">
+            {{ course }}
+        </td>
+        {% for assessment in allAssessments %}
+            {% set colspan = assessment.attainmentActive == 'Y' and assessment.effortActive == 'Y' ? 2 : 1 %}
+            {% if assessment.attainmentActive == 'Y' %}
+                {# Display the attainment value or descriptor for the course and assessment #}
+                <td class="border-top border-bottom border-left {{ loop.last and colspan == 1 ? 'border-right' }}">
+                    {{- assessments[assessment.name].attainmentDescriptor ?? assessments[assessment.name].attainmentValue }}
+                </td>
+                {# Update the total attainment values for averaging later #}
+                {% set totalArray = totalArray|merge({ (assessment.name): (totalArray[assessment.name] ?? 0) + (assessments[assessment.name].attainmentValue|default(0) + 0) }) %}
+                {# Check if the attainment value contains a percentage #}
+                {% set percentArray = percentArray|merge({ (assessment.name): ('%' in assessments[assessment.name].attainmentValue|default('')) }) %}
+            {% endif %}
+            {% if assessment.effortActive == 'Y' %}
+                {# Display the effort value or descriptor for the course and assessment #}
+                <td class="border-top border-bottom {{ colspan == 1 ? 'border-left' }} {{ loop.last ? 'border-right' }}">
+                    {{- assessments[assessment.name].effortDescriptor ?? assessments[assessment.name].effortValue }}
+                </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    
+       {# Separate table for averages #}
+{% if config.includeAverage == 'Y' %}
+<table class="w-full table" cellspacing="0" cellpadding="10" nobr="true" style="margin-top: 20px;">
+    <tr>
+        <td class="header bg-secondary border-top border-bottom border-left">
+            <b>{{ __('Average') }}</b>
+        </td>
+        {% for assessment in allAssessments %}
+            {% if assessment.attainmentActive == 'Y' %}
+                <td class="header bg-secondary border-top border-bottom border-left {{ loop.last ? 'border-right' }}">
+                    {{- assessment.name -}}
+                </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    <tr>
+        <td class="border-top border-bottom border-left">
+            <b>{{ __('Average Values') }}</b>
+        </td>
+        {% for assessment in allAssessments %}
+            {% if assessment.attainmentActive == 'Y' %}
+                {# Calculate and display the average for each assessment #}
+                <td class="border-top border-bottom border-left {{ loop.last ? 'border-right' }}">
+                    {{- (totalArray[assessment.name]|default(0) / (internalAssessmentByCourse.courses|length > 0 ? internalAssessmentByCourse.courses|length : 1))|round(1) }}
+                </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+</table>
+{% endif %}
+
+
+{# Calculate the total number of assessments #}
+{% set totalAssessments = allAssessments|length %}
+
+{# Calculate the combined average for the report #}
+{% set totalSum = 0 %}
+{% set totalCount = 0 %}
+{% for assessment in allAssessments %}
+    {% set totalSum = totalSum + totalArray[assessment.name]|default(0) %}
+    {% set totalCount = totalCount + (internalAssessmentByCourse.courses|length > 0 ? internalAssessmentByCourse.courses|length : 0) %}
+{% endfor %}
+{% set combinedAverage = (totalSum / (totalCount > 0 ? totalCount : 1))|round(1) %}
+
+{# Display the total and average #}
+<div class="summary-section" style="margin-bottom: 20px;">
+    <p class="font-bold">
+        {{ __('Total Number of Assessments:') }} {{ totalAssessments }}
+    </p>
+    <p class="font-bold">
+        {{ __('Combined Average:') }} {{ combinedAverage }}
+    </p>
+</div>
+
+{# Main table for courses and their assessments #}
+<table class="w-full table" cellspacing="0" cellpadding="10" nobr="true">
+    <tr>
+        <td class="header bg-primary border-top border-bottom border-left {{ allAssessments|length == 0 ? 'border-right' }}" rowspan="{{ allAssessments ? 2 : 1 }}">
+            {{ __('Courses') }}
+        </td>
+        {% for assessment in allAssessments %}
+            {% set colspan = assessment.attainmentActive == 'Y' and assessment.effortActive == 'Y' ? 2 : 1 %}
+            <td class="header bg-primary border-top border-bottom {{ loop.last ? 'border-right' }}" colspan="{{ colspan }}">
+                {{- assessment.name -}}
+            </td>
+        {% endfor %}
+    </tr>
+    <tr>
+        {% for assessment in allAssessments %}
+            {% set colspan = assessment.attainmentActive == 'Y' and assessment.effortActive == 'Y' ? 2 : 1 %}
+            {% if assessment.attainmentActive == 'Y' %}
+                <td class="border-top border-bottom border-left {{ loop.last and colspan == 1 ? 'border-right' }}">
+                    {{- __('Attainment') }}
+                </td>
+            {% endif %}
+            {% if assessment.effortActive == 'Y' %}
+                <td class="border-top border-bottom {{ colspan == 1 ? 'border-left' }} {{ loop.last ? 'border-right' }}">
+                    {{- __('Effort') }}
+                </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+
+    {# Remaining table rows for courses and assessments #}
+</table>
+
+</table>
+
+<br/>

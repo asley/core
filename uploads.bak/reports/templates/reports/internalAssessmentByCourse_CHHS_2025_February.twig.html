@@ -1,0 +1,174 @@
+{#<!--
+name: Internal Assessment by Course February 2025
+category: Student Data
+types: Body
+sources:
+    student: Student
+    internalAssessmentByCourse: InternalAssessmentByCourse
+    reportingCycle: ReportingCycle
+config:
+    includeAverage:
+        label: Include Average Attainment?
+        type: yesno
+        default: Y
+    limitByReportingCycle:
+        label: Limit Columns by Reporting Cycle?
+        type: yesno
+        default: Y
+-->#}
+
+
+{{- stylesheet ? include(stylesheet) -}}
+
+
+{% set totalArray = {} %}
+{% set percentArray = {} %}
+
+{# ✅ Filter assessments based on reporting cycle configuration #}
+{% if config.limitByReportingCycle == 'Y' %}
+    {% set allAssessments = internalAssessmentByCourse.assessments|filter(a => (a.completeDate >= reportingCycle.dateStart and a.completeDate <= reportingCycle.dateEnd) ) %}
+{% else %}
+    {% set allAssessments = internalAssessmentByCourse.assessments %}
+{% endif %}
+
+{# Reporting Cycle#}
+<tr>
+        {% for cycleNum in range(1, reportingCycle.cycleTotal|default(1)) %}
+            {% set cycleName = reportingCycle.cycles[cycleNum] %}
+            <td class="border" >
+                {{- cycleName -}}
+            </td>
+        {% endfor %}
+    </tr>
+
+<table class= "w-full table" cellspacing="0" cellpadding="4" nobr="true" style="font-size: 11px;">
+    {# 🔹 Table Header Row: Course Names #}
+    <tr>
+        <td class="header bg-primary border-top border-bottom border-right border-left">
+            {{ __('Subjects') }}
+        </td>
+        <td class="header bg-primary border-top border-bottom border-left border-right text-center">
+            {{ __('Grade') }}
+        </td>
+        <td class="header bg-primary border-top border-bottom border-left border-right text-center">
+            {{ __('Effort') }}
+        </td>
+    </tr>
+
+    {# 🔹 Iterate Through Each Course and Display Data #}
+    {% for course, assessments in internalAssessmentByCourse.courses %}
+    <tr>
+        <td class="border-top bg-primary border-bottom border-left " style="font-weight: bold;">
+            {{ course }}
+        </td>
+
+        {# ✅ Dynamically Fetch the First Available Assessment Name #}
+        {% set firstAssessment = assessments|keys|first %}
+        {% set assessmentData = assessments[firstAssessment] is defined ? assessments[firstAssessment] : {} %}
+
+        {# ✅ Display Attainment Value or Descriptor #}
+        <td class="border-top bg-primary border-bottom border-left text-center">
+            {{ assessmentData.attainmentDescriptor is defined and assessmentData.attainmentDescriptor is not empty
+                ? assessmentData.attainmentDescriptor
+                : (assessmentData.attainmentValue is defined and assessmentData.attainmentValue is not empty 
+                    ? assessmentData.attainmentValue 
+                    : 'N/A') }}
+        </td>
+
+        {# ✅ Display Effort Value or Descriptor #}
+        <td class="border-top bg-primary border-bottom border-left border-right text-center">
+            {{ assessmentData.effortDescriptor is defined and assessmentData.effortDescriptor is not empty
+                ? assessmentData.effortDescriptor
+                : (assessmentData.effortValue is defined and assessmentData.effortValue is not empty 
+                    ? assessmentData.effortValue 
+                    : 'N/A') }}
+        </td>
+
+        {# ✅ Store total values for calculating averages #}
+        {% if assessmentData.attainmentValue is defined and assessmentData.attainmentValue is not empty %}
+            {% set totalArray = totalArray|merge({ (course): (assessmentData.attainmentValue|replace({'%': '', ',': ''})|trim) }) %}
+        {% endif %}
+
+        {% if assessmentData.effortValue is defined and assessmentData.effortValue is not empty %}
+            {% set percentArray = percentArray|merge({ (course): (assessmentData.effortValue|replace({'%': '', ',': ''})|trim) }) %}
+        {% endif %}
+    </tr>
+
+    {# 🔹 Row for displaying Teacher Comments & Teacher Name #}
+    {% if assessmentData.comment is defined and assessmentData.comment is not empty %}
+    <tr>
+        <td class="border-bottom border-left border-right bg-light text-sm" colspan="3" style="font-size: 9px; padding: 3px;">
+            <i>{{ assessmentData.comment }}</i>
+            <br>
+            <span style="font-size: 7px; font-weight: bold; display: inline-block; width: 50%;">
+                {{ assessmentData.teacherName is defined and assessmentData.teacherName is not empty 
+                    ? assessmentData.teacherName 
+                    : 'N/A' }}
+            </span>
+        </td>
+    </tr>
+    {% endif %}
+
+    {% endfor %}
+    
+    {# ✅ Display Average Scores (If Configured) #}
+   
+
+    {% if config.includeAverage == 'Y' %}
+<tr>
+     <td class="header bg-primary border-top border-bottom border-left border-right text-center" style="font-weight: bold;">
+        {{ __('Average') }}
+    </td> 
+    
+
+    {# Initialize Sum and Count for Attainment #}
+    {% set totalAttainmentSum = 0 %}
+    {% set totalAttainmentCount = 0 %}
+
+       
+
+    {% for key, value in totalArray %}
+        {# Remove '%' and trim whitespace #}
+        {% set cleanedValue = value|replace({'%': ''})|trim %}
+
+        {# Check if the cleaned value is numeric #}
+     {# Match integer #}
+        {% if cleanedValue matches '/^\\d+$/' %}
+        {% endif %}
+
+        {# Match floating point number #}
+        {% if cleanedValue matches '/^[-+]?[0-9]*\\.?[0-9]+$/' %}
+        {% endif %}
+
+
+
+            {# Coerce to number by multiplying by 1 #}
+            {% set numericValue = cleanedValue * 1 %}
+            {% set totalAttainmentSum = totalAttainmentSum + numericValue %}
+            {% set totalAttainmentCount = totalAttainmentCount + 1 %}
+       
+    {% endfor %}
+
+
+
+    {# Display Calculated Average Attainment #}
+    <td class="header bg-primary border-top border-bottom border-left border-right text-center">
+        {% if totalAttainmentCount > 0 %}
+            {% set averageAttainment = (totalAttainmentSum / totalAttainmentCount)|round(1) %}
+            {{ averageAttainment }}%
+        {% else %}
+            N/A
+        {% endif %}
+    </td>
+
+    
+</tr>
+{% endif %}
+    
+</table>
+
+
+
+
+
+

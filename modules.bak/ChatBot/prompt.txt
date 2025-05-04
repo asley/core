@@ -1,0 +1,62 @@
+TITLE: Build “Teaching & Intervention Assistant” for Gibbon
+
+GOAL
+=====
+Design and implement an AI-driven ChatBot sub-module that aids teachers and administrators.
+
+KEY FEATURES
+------------
+1. LESSON / UNIT PLAN GENERATOR
+   • CLI + Web UI wizard that asks course name, topic list, duration, Bloom’s level, resources.
+   • Back-end: DeepSeek prompt templates produce detailed lesson & unit plans in Markdown
+     then convert to HTML via existing Gibbon formatting helpers (Format::markdown() etc.).
+2. ITERATIVE LEARNING
+   • Accept teacher feedback on generated plans (👍 / 👎  + text).
+   • Store feedback in `gibbonChatBotTraining` table; nightly cron retrains a local vector
+     store (e.g. sqlite embeddings) so future prompts reflect teacher style.
+3. STUDENT PERFORMANCE ANALYSIS
+   • Consume marks from `gibbonInternalAssessmentEntry` and `gibbonExternalAssessmentEntry`.
+   • Detect students < 50 % average or dropping ≥10 % over last 3 assessments.
+   • Generate “Plan Intervention” JSON with strategies (extra practice, group tutoring, etc.).
+   • Display in learning_management.php under an <AssessmentInsights> card.
+4. ADMIN DASHBOARD
+   • Tabbed page: “Lesson Plans | Interventions | Model Training”.
+   • Live DataTables & AJAX endpoints in `api/teachingAssistant.php`.
+5. CODE CONVENTIONS
+   • Follow Gibbon MVC: new controller in /modules/ChatBot/controller/TeachingAssistant.php
+     view scripts in /modules/ChatBot/templates/
+   • Use existing `ModulePublicPage` / `ModuleAdminPage` classes for header/footer/breadcrumb.
+   • All strings via __() for i18n.
+   • PHP 8 strict types, PSR-12, namespaced under `Gibbon\Modules\ChatBot`.
+6. TESTS
+   • PHPUnit unit test for AssessmentService::generateIntervention().
+   • Feature test hitting API endpoint returns expected JSON shape.
+
+ACCEPTANCE CRITERIA
+-------------------
+☑ Teacher can generate & download a unit plan in browser.  
+☑ Admin sees coloured risk badges beside failing students.  
+☑ Unit tests pass (`vendor/bin/phpunit`).  
+☑ Code passes `php -l` and respects Gibbon header/footer helpers.
+
+RESOURCES
+---------
+• DeepSeek API via DEEPSEEK_API_KEY (already exported).  
+• Existing DB tables: gibbonCourseClass, gibbonStudentEnrolment, gibbonInternalAssessmentEntry.  
+• Reference similar pages: assessment_integration.php, learning_management.php.
+
+TASK LIST (suggested)
+---------------------
+1. Scaffold folders & routes.  
+2. Implement AssessmentService::generateIntervention().  
+3. Build LessonPlanPrompt templates.  
+4. Create UI pages & forms.  
+5. Wire DeepSeek calls.  
+6. Write PHPUnit tests & wire to --test-cmd.  
+7. Document README.md with setup + cron info.
+
+RUN CONSTRAINTS
+---------------
+* Use `cowboy_mode` (already true) – auto-run shell & tests.
+* After each major file write: run `vendor/bin/phpunit --colors`.
+* Ask before DB migrations.

@@ -1,6 +1,4 @@
 <?php
-
-use Gibbon\Domain\Finance\FinanceBudgetCycleGateway;
 /*
 Gibbon: the flexible, open school platform
 Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
@@ -23,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 include '../../gibbon.php';
 
-$gibbonFinanceBudgetCycleID = $_POST['gibbonFinanceBudgetCycleID'] ?? '';
+$gibbonFinanceBudgetCycleID = $_GET['gibbonFinanceBudgetCycleID'] ?? '';
 $address = $_POST['address'] ?? '';
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($address).'/budgetCycles_manage_delete.php&gibbonFinanceBudgetCycleID='.$gibbonFinanceBudgetCycleID;
 $URLDelete = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($address).'/budgetCycles_manage.php';
@@ -39,14 +37,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Finance/budgetCycles_manag
         header("Location: {$URL}");
     } else {
         try {
-            $result = $container->get(FinanceBudgetCycleGateway::class)->getByID($gibbonFinanceBudgetCycleID);
+            $data = array('gibbonFinanceBudgetCycleID' => $gibbonFinanceBudgetCycleID);
+            $sql = 'SELECT * FROM gibbonFinanceBudgetCycle WHERE gibbonFinanceBudgetCycleID=:gibbonFinanceBudgetCycleID';
+            $result = $connection2->prepare($sql);
+            $result->execute($data);
         } catch (PDOException $e) {
             $URL .= '&return=error2';
             header("Location: {$URL}");
             exit();
         }
 
-        if (empty($result)) {
+        if ($result->rowCount() != 1) {
             $URL .= '&return=error2';
             header("Location: {$URL}");
         } else {

@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 include '../../gibbon.php';
 
-$gibbonMessengerID = $_POST['gibbonMessengerID'] ?? '';
+$gibbonMessengerID = $_GET['gibbonMessengerID'] ?? '';
 $search = $_GET['search'] ?? '';
 
 $address = $_POST['address'] ?? '';

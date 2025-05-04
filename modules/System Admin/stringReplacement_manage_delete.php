@@ -45,8 +45,7 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/stringReplace
         if ($result->rowCount() != 1) {
             $page->addError(__('The specified record cannot be found.'));
         } else {
-            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/stringReplacement_manage_deleteProcess.php?search=$search");
-            $form->addHiddenValue('gibbonStringID', $gibbonStringID);
+            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/stringReplacement_manage_deleteProcess.php?gibbonStringID=$gibbonStringID&search=$search");
             echo $form->getOutput();
         }
     }

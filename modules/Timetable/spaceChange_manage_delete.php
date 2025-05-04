@@ -59,8 +59,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Timetable/spaceChange_mana
             if ($result->rowCount() != 1) {
                 $page->addError(__('The specified record cannot be found.'));
             } else {
-                $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/spaceChange_manage_deleteProcess.php");
-                $form->addHiddenValue('gibbonTTSpaceChangeID', $gibbonTTSpaceChangeID);
+                $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/spaceChange_manage_deleteProcess.php?gibbonTTSpaceChangeID=$gibbonTTSpaceChangeID");
                 echo $form->getOutput();
             }
         }

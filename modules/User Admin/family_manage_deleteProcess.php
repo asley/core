@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 include '../../gibbon.php';
 
-$gibbonFamilyID = $_POST['gibbonFamilyID'] ?? '';
+$gibbonFamilyID = $_GET['gibbonFamilyID'] ?? '';
 $search = $_GET['search'] ?? '';
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/family_manage_delete.php&gibbonFamilyID=$gibbonFamilyID&search=$search";
 $URLDelete = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/family_manage.php&search=$search";

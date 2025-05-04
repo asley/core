@@ -74,7 +74,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Admissions/applications_ma
         'identifier'     => $application['identifier'],
         'accessID'       => $account['accessID'],
         'accessToken'    => $account['accessToken'],
-        'accountEmail'   => $account['email'] ?? '',
         'gibbonPersonID' => $account['gibbonPersonID'],
         'gibbonFamilyID' => $account['gibbonFamilyID'],
     ]);

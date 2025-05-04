@@ -31,8 +31,7 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/activitySetti
     if (empty($gibbonActivityTypeID)) {
         $page->addError(__('You have not specified one or more required parameters.'));
     } else {
-        $form = DeleteForm::createForm($session->get('absoluteURL')."/modules/School Admin/activitySettings_type_deleteProcess.php", true);
-        $form->addHiddenValue('gibbonActivityTypeID', $gibbonActivityTypeID);
+        $form = DeleteForm::createForm($session->get('absoluteURL')."/modules/School Admin/activitySettings_type_deleteProcess.php?gibbonActivityTypeID=$gibbonActivityTypeID", true);
         echo $form->getOutput();
     }
 }

@@ -40,8 +40,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Finance/expenseApprovers_m
         if ($result->rowCount() != 1) {
             $page->addError(__('The specified record cannot be found.'));
         } else {
-            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/expenseApprovers_manage_deleteProcess.php");
-            $form->addHiddenValue('gibbonFinanceExpenseApproverID', $gibbonFinanceExpenseApproverID);
+            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/expenseApprovers_manage_deleteProcess.php?gibbonFinanceExpenseApproverID=$gibbonFinanceExpenseApproverID");
             echo $form->getOutput();
         }
     }

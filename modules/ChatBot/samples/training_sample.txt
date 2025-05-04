@@ -1,0 +1,29 @@
+What is a spreadsheet?
+A spreadsheet is a digital tool used to organize, calculate, and analyze data in rows and columns.
+
+What is a row in a spreadsheet?
+A row is a horizontal series of cells identified by numbers (1, 2, 3, etc).
+
+What is a column in a spreadsheet?
+A column is a vertical series of cells identified by letters (A, B, C, etc).
+
+How do you identify a cell in a spreadsheet?
+A cell is identified by its column letter and row number (e.g., A1, B2, C3).
+
+What is a function in a spreadsheet?
+A function is a predefined formula that performs calculations using specific values, like SUM() or AVERAGE().
+
+How do you add numbers in a spreadsheet?
+Use the SUM function. For example, SUM(A1:A5) adds all numbers in cells A1 through A5.
+
+What is data validation?
+Data validation is a feature that ensures data entered into cells meets specific criteria or rules.
+
+How do you create a chart?
+Select your data range, then use the Insert Chart option to visualize your data graphically.
+
+What is cell formatting?
+Cell formatting allows you to change how data appears, including number formats, text styles, and colors.
+
+How do you sort data?
+Use the Sort function to arrange data alphabetically, numerically, or by custom criteria. 

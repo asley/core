@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 include '../../gibbon.php';
 
-$gibbonTTSpaceBookingID = $_POST['gibbonTTSpaceBookingID'] ?? '';
+$gibbonTTSpaceBookingID = $_GET['gibbonTTSpaceBookingID'] ?? '';
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/spaceBooking_manage_delete.php&gibbonTTSpaceBookingID='.$gibbonTTSpaceBookingID;
 $URLDelete = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/spaceBooking_manage.php';
 

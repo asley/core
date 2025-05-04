@@ -31,17 +31,10 @@ $gibbonLibraryTypeID = $_GET['gibbonLibraryTypeID'] ?? '';
 $gibbonSpaceID = $_GET['gibbonSpaceID'] ?? '';
 $status = $_GET['status'] ?? '';
 
-$gibbonPersonIDStudent = $_REQUEST['gibbonPersonIDStudent'] ?? '';
-$lendingAction = $_REQUEST['lendingAction'] ?? '';
-
 if ($gibbonLibraryItemID == '') { echo 'Fatal error loading this page!';
 } else {
-    $URL = !empty($gibbonPersonIDStudent)
-        ? $session->get('absoluteURL')."/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=$gibbonPersonIDStudent&search=&search=&allStudents=&subpage=Library Borrowing&lendingAction=$lendingAction"
-        : $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/library_lending_item_return.php&gibbonLibraryItemID=$gibbonLibraryItemID&gibbonLibraryItemEventID=$gibbonLibraryItemEventID&name=$name&gibbonLibraryTypeID=$gibbonLibraryTypeID&gibbonSpaceID=$gibbonSpaceID&status=$status";
-    $URLSuccess = !empty($gibbonPersonIDStudent)
-        ? $session->get('absoluteURL')."/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=$gibbonPersonIDStudent&search=&search=&allStudents=&subpage=Library Borrowing&lendingAction=$lendingAction"
-        : $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/library_lending_item.php&gibbonLibraryItemID=$gibbonLibraryItemID&gibbonLibraryItemEventID=$gibbonLibraryItemEventID&name=$name&gibbonLibraryTypeID=$gibbonLibraryTypeID&gibbonSpaceID=$gibbonSpaceID&status=$status";
+    $URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/library_lending_item_return.php&gibbonLibraryItemID=$gibbonLibraryItemID&gibbonLibraryItemEventID=$gibbonLibraryItemEventID&name=$name&gibbonLibraryTypeID=$gibbonLibraryTypeID&gibbonSpaceID=$gibbonSpaceID&status=$status";
+    $URLSuccess = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/library_lending_item.php&gibbonLibraryItemID=$gibbonLibraryItemID&gibbonLibraryItemEventID=$gibbonLibraryItemEventID&name=$name&gibbonLibraryTypeID=$gibbonLibraryTypeID&gibbonSpaceID=$gibbonSpaceID&status=$status";
 
     if (isActionAccessible($guid, $connection2, '/modules/Library/library_lending_item_return.php') == false) {
         $URL .= '&return=error0';
@@ -64,12 +57,10 @@ if ($gibbonLibraryItemID == '') { echo 'Fatal error loading this page!';
                 exit();
             }
 
-            if ($result->rowCount() < 1) {
+            if ($result->rowCount() != 1) {
                 $URL .= '&return=error2';
                 header("Location: {$URL}");
             } else {
-                $event = $result->fetch();
-
                 //Validate Inputs
                 $returnAction = $_POST['returnAction'] ?? '';
                 $status = '';
@@ -84,21 +75,29 @@ if ($gibbonLibraryItemID == '') { echo 'Fatal error loading this page!';
 
 
                 //Write to database
-                if ($event['status'] == 'Reserved') {
-                    $data = ['gibbonLibraryItemEventID' => $gibbonLibraryItemEventID];
-                    $sql = "DELETE FROM gibbonLibraryItemEvent WHERE gibbonLibraryItemEventID=:gibbonLibraryItemEventID";
-                    $deleted = $pdo->delete($sql, $data);
-                } else {
-                    $data = ['timestampReturn' => date('Y-m-d H:i:s', time()), 'gibbonLibraryItemEventID' => $gibbonLibraryItemEventID, 'gibbonPersonIDIn' => $session->get('gibbonPersonID')];
+                try {
+                    $data = array('timestampReturn' => date('Y-m-d H:i:s', time()), 'gibbonLibraryItemEventID' => $gibbonLibraryItemEventID, 'gibbonPersonIDIn' => $session->get('gibbonPersonID'));
                     $sql = "UPDATE gibbonLibraryItemEvent SET status='Returned', timestampReturn=:timestampReturn, gibbonPersonIDIn=:gibbonPersonIDIn WHERE gibbonLibraryItemEventID=:gibbonLibraryItemEventID";
-                    $updated = $pdo->update($sql, $data);
+                    $result = $connection2->prepare($sql);
+                    $result->execute($data);
+                } catch (PDOException $e) {
+                    $URL .= '&return=error2';
+                    header("Location: {$URL}");
+                    exit();
                 }
 
                 //No return action, so just mark the item
-                if ($returnAction == '' && $event['status'] != 'Reserved') {
-                    $data = array('gibbonLibraryItemID' => $gibbonLibraryItemID, 'gibbonPersonIDStatusRecorder' => $session->get('gibbonPersonID'), 'timestampStatus' => date('Y-m-d H:i:s', time()));
-                    $sql = "UPDATE gibbonLibraryItem SET status='Available', gibbonPersonIDStatusResponsible=NULL, gibbonPersonIDStatusRecorder=:gibbonPersonIDStatusRecorder, timestampStatus=:timestampStatus, returnExpected=NULL, returnAction='', gibbonPersonIDReturnAction=NULL WHERE gibbonLibraryItemID=:gibbonLibraryItemID";
-                    $updated = $pdo->update($sql, $data);
+                if ($returnAction == '') {
+                    try {
+                        $data = array('gibbonLibraryItemID' => $gibbonLibraryItemID, 'gibbonPersonIDStatusRecorder' => $session->get('gibbonPersonID'), 'timestampStatus' => date('Y-m-d H:i:s', time()));
+                        $sql = "UPDATE gibbonLibraryItem SET status='Available', gibbonPersonIDStatusResponsible=NULL, gibbonPersonIDStatusRecorder=:gibbonPersonIDStatusRecorder, timestampStatus=:timestampStatus, returnExpected=NULL, returnAction='', gibbonPersonIDReturnAction=NULL WHERE gibbonLibraryItemID=:gibbonLibraryItemID";
+                        $result = $connection2->prepare($sql);
+                        $result->execute($data);
+                    } catch (PDOException $e) {
+                        $URL .= '&return=error2';
+                        header("Location: {$URL}");
+                        exit();
+                    }
                 }
                 //Return action, so mark the item, and create a new event
                 else {

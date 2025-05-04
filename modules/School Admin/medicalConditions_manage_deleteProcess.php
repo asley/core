@@ -23,7 +23,7 @@ use Gibbon\Domain\School\MedicalConditionGateway;
 
 require_once '../../gibbon.php';
 
-$gibbonMedicalConditionID = $_POST['gibbonMedicalConditionID'] ?? '';
+$gibbonMedicalConditionID = $_GET['gibbonMedicalConditionID'] ?? '';
 
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/School Admin/medicalConditions_manage.php';
 

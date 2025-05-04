@@ -19,12 +19,11 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-use Gibbon\Data\Validator;
-use Gibbon\Services\Format;
 use Gibbon\Comms\NotificationSender;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Data\Validator;
 use Gibbon\Domain\System\NotificationGateway;
-use Gibbon\Domain\Finance\FinanceExpenseApproverGateway;
+use Gibbon\Services\Format;
 
 require_once '../../gibbon.php';
 
@@ -87,8 +86,14 @@ if ($gibbonFinanceBudgetCycleID == '' or $gibbonFinanceBudgetID == '') { echo 'F
                         header("Location: {$URL}");
                     } else {
                         //Check if there are approvers
-                        $result = $container->get(FinanceExpenseApproverGateway::class)->selectExpenseApprovers();
-                        
+                        try {
+                            $data = array();
+                            $sql = "SELECT * FROM gibbonFinanceExpenseApprover JOIN gibbonPerson ON (gibbonFinanceExpenseApprover.gibbonPersonID=gibbonPerson.gibbonPersonID) WHERE status='Full'";
+                            $result = $connection2->prepare($sql);
+                            $result->execute($data);
+                        } catch (PDOException $e) {
+                        }
+
                         if ($result->rowCount() < 1) {
                             $URL .= '&return=error0';
                             header("Location: {$URL}");
@@ -133,7 +138,7 @@ if ($gibbonFinanceBudgetCycleID == '' or $gibbonFinanceBudgetID == '') { echo 'F
                                         $approval = 'Approval - Partial - Budget';
                                     } else {
                                         //Check if school approver, if not, abort
-                                        $data = ['gibbonPersonID' => $session->get('gibbonPersonID')];
+                                        $data = array('gibbonPersonID' => $session->get('gibbonPersonID'));
                                         $sql = "SELECT * FROM gibbonFinanceExpenseApprover JOIN gibbonPerson ON (gibbonFinanceExpenseApprover.gibbonPersonID=gibbonPerson.gibbonPersonID) WHERE status='Full' AND gibbonFinanceExpenseApprover.gibbonPersonID=:gibbonPersonID";
                                         $result = $connection2->prepare($sql);
                                         $result->execute($data);

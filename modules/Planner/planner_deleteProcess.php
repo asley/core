@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 include '../../gibbon.php';
 
-$gibbonPlannerEntryID = $_POST['gibbonPlannerEntryID'] ?? '';
+$gibbonPlannerEntryID = $_GET['gibbonPlannerEntryID'] ?? '';
 $viewBy = $_POST['viewBy'] ?? '';
 $subView = $_POST['subView'] ?? '';
 if ($viewBy != 'date' and $viewBy != 'class') {

@@ -52,12 +52,7 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/stringReplace
 
     $row = $form->addRow();
         $row->addLabel('original', __('Original String'));
-        $row->addFinder('original')
-            ->fromAjax($session->get('absoluteURL').'/modules/System Admin/stringReplacement_searchAjax.php')
-            ->setParameter('tokenLimit', 1)
-            ->setParameter('allowFreeTagging', true)
-            ->maxLength(255)
-            ->required();
+        $row->addTextField('original')->required()->maxLength(255);
 
     $row = $form->addRow();
         $row->addLabel('replacement', __('Replacement String'));

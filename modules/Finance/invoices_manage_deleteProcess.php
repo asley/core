@@ -23,13 +23,13 @@ include '../../gibbon.php';
 
 include './moduleFunctions.php';
 
-$gibbonSchoolYearID = $_POST['gibbonSchoolYearID'] ?? '';
+$gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? '';
 $gibbonFinanceInvoiceID = $_POST['gibbonFinanceInvoiceID'] ?? '';
 $status = $_GET['status'] ?? null;
-$gibbonFinanceInvoiceeID = $_POST['gibbonFinanceInvoiceeID'] ?? null;
+$gibbonFinanceInvoiceeID = $_GET['gibbonFinanceInvoiceeID'] ?? null;
 $monthOfIssue = $_GET['monthOfIssue'] ?? null;
-$gibbonFinanceBillingScheduleID = $_POST['gibbonFinanceBillingScheduleID'] ?? null;
-$gibbonFinanceFeeCategoryID = $_POST['gibbonFinanceFeeCategoryID'] ?? null;
+$gibbonFinanceBillingScheduleID = $_GET['gibbonFinanceBillingScheduleID'] ?? null;
+$gibbonFinanceFeeCategoryID = $_GET['gibbonFinanceFeeCategoryID'] ?? null;
 
 if ($gibbonFinanceInvoiceID == '' or $gibbonSchoolYearID == '') { echo 'Fatal error loading this page!';
 } else {

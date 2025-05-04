@@ -40,8 +40,7 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/schoolYearTer
         if ($result->rowCount() != 1) {
             $page->addError(__('The specified record cannot be found.'));
         } else {
-            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/schoolYearTerm_manage_deleteProcess.php", true);
-            $form->addHiddenValue('gibbonSchoolYearTermID', $gibbonSchoolYearTermID);
+            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/schoolYearTerm_manage_deleteProcess.php?gibbonSchoolYearTermID=$gibbonSchoolYearTermID", true);
             echo $form->getOutput();
         }
     }

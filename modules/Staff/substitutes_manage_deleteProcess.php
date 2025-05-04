@@ -23,7 +23,7 @@ use Gibbon\Domain\Staff\SubstituteGateway;
 
 require_once '../../gibbon.php';
 
-$gibbonSubstituteID = $_POST['gibbonSubstituteID'] ?? '';
+$gibbonSubstituteID = $_GET['gibbonSubstituteID'] ?? '';
 
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/Staff/substitutes_manage.php';
 

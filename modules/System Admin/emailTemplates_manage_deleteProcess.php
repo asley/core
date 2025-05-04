@@ -23,7 +23,7 @@ use Gibbon\Domain\System\EmailTemplateGateway;
 
 include '../../gibbon.php';
 
-$gibbonEmailTemplateID = $_POST['gibbonEmailTemplateID'] ?? '';
+$gibbonEmailTemplateID = $_GET['gibbonEmailTemplateID'] ?? '';
 
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/emailTemplates_manage.php';
 

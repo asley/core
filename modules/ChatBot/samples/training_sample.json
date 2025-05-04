@@ -1,0 +1,54 @@
+{
+    "training_data": [
+        {
+            "question": "What is a spreadsheet?",
+            "answer": "A spreadsheet is a digital tool used to organize, calculate, and analyze data in rows and columns.",
+            "category": "Basic"
+        },
+        {
+            "question": "What is a row in a spreadsheet?",
+            "answer": "A row is a horizontal series of cells identified by numbers (1, 2, 3, etc).",
+            "category": "Basic"
+        },
+        {
+            "question": "What is a column in a spreadsheet?",
+            "answer": "A column is a vertical series of cells identified by letters (A, B, C, etc).",
+            "category": "Basic"
+        },
+        {
+            "question": "How do you identify a cell in a spreadsheet?",
+            "answer": "A cell is identified by its column letter and row number (e.g., A1, B2, C3).",
+            "category": "Basic"
+        },
+        {
+            "question": "What is a function in a spreadsheet?",
+            "answer": "A function is a predefined formula that performs calculations using specific values, like SUM() or AVERAGE().",
+            "category": "Functions"
+        },
+        {
+            "question": "How do you add numbers in a spreadsheet?",
+            "answer": "Use the SUM function. For example, SUM(A1:A5) adds all numbers in cells A1 through A5.",
+            "category": "Functions"
+        },
+        {
+            "question": "What is data validation?",
+            "answer": "Data validation is a feature that ensures data entered into cells meets specific criteria or rules.",
+            "category": "Advanced"
+        },
+        {
+            "question": "How do you create a chart?",
+            "answer": "Select your data range, then use the Insert Chart option to visualize your data graphically.",
+            "category": "Advanced"
+        },
+        {
+            "question": "What is cell formatting?",
+            "answer": "Cell formatting allows you to change how data appears, including number formats, text styles, and colors.",
+            "category": "Basic"
+        },
+        {
+            "question": "How do you sort data?",
+            "answer": "Use the Sort function to arrange data alphabetically, numerically, or by custom criteria.",
+            "category": "Advanced"
+        }
+    ]
+} 

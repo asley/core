@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 include '../../gibbon.php';
 
-$gibbonExternalAssessmentID = $_POST['gibbonExternalAssessmentID'] ?? '';
+$gibbonExternalAssessmentID = $_GET['gibbonExternalAssessmentID'] ?? '';
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/externalAssessments_manage_delete.php&gibbonExternalAssessmentID='.$gibbonExternalAssessmentID;
 $URLDelete = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/externalAssessments_manage.php';
 

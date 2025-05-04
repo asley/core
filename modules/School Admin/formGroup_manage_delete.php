@@ -42,8 +42,7 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/formGroup_man
         if ($result->rowCount() != 1) {
             $page->addError(__('The specified record cannot be found.'));
         } else {
-            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/formGroup_manage_deleteProcess.php", true);
-            $form->addHiddenValue('gibbonFormGroupID', $gibbonFormGroupID);
+            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/formGroup_manage_deleteProcess.php?gibbonFormGroupID=$gibbonFormGroupID", true);
             echo $form->getOutput();
         }
     }

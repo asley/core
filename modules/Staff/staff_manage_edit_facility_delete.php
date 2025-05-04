@@ -51,9 +51,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Staff/staff_manage_edit_fa
         if ($result->rowCount() != 1) {
             $page->addError(__('The specified record cannot be found.'));
         } else {
-            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/staff_manage_edit_facility_deleteProcess.php?search=$search&allStaff=$allStaff");
-            $form->addHiddenValue('gibbonStaffID', $gibbonStaffID);
-            $form->addHiddenValue('gibbonSpacePersonID', $gibbonSpacePersonID);
+            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/staff_manage_edit_facility_deleteProcess.php?gibbonStaffID=$gibbonStaffID&gibbonSpacePersonID=$gibbonSpacePersonID&search=$search&allStaff=$allStaff");
             echo $form->getOutput();
         }
     }

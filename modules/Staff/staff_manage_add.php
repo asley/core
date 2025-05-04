@@ -79,7 +79,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Staff/staff_manage_add.php
 
     $row = $form->addRow();
         $row->addLabel('firstAidQualified', __('First Aid Qualified?'));
-        $row->addYesNo('firstAidQualified')->placeHolder()->selected('N');
+        $row->addYesNo('firstAidQualified')->placeHolder();
 
     $form->toggleVisibilityByClass('firstAid')->onSelect('firstAidQualified')->when('Y');
 

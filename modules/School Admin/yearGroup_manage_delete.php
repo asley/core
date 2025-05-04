@@ -40,8 +40,7 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/yearGroup_man
         if ($result->rowCount() != 1) {
             $page->addError(__('The specified record cannot be found.'));
         } else {
-            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/yearGroup_manage_deleteProcess.php", true);
-            $form->addHiddenValue('gibbonYearGroupID', $gibbonYearGroupID);
+            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/yearGroup_manage_deleteProcess.php?gibbonYearGroupID=$gibbonYearGroupID", true);
             echo $form->getOutput();
         }
     }

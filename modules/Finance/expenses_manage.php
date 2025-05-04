@@ -19,12 +19,10 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-use Gibbon\Forms\Form;
-use Gibbon\Services\Format;
-use Gibbon\Forms\Prefab\BulkActionForm;
 use Gibbon\Domain\System\SettingGateway;
-use Gibbon\Domain\Finance\FinanceBudgetCycleGateway;
-use Gibbon\Domain\Finance\FinanceExpenseApproverGateway;
+use Gibbon\Forms\Form;
+use Gibbon\Forms\Prefab\BulkActionForm;
+use Gibbon\Services\Format;
 
 //Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -85,9 +83,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Finance/expenses_manage.ph
             if ($expenseApprovalType == '' or $budgetLevelExpenseApproval == '') {
                 $page->addError(__('An error has occurred with your expense and budget settings.'));
             } else {
-                // Check if there are approvers
-                $result = $container->get(FinanceExpenseApproverGateway::class)->selectExpenseApprovers();
-                
+                //Check if there are approvers
+                try {
+                    $data = array();
+                    $sql = "SELECT * FROM gibbonFinanceExpenseApprover JOIN gibbonPerson ON (gibbonFinanceExpenseApprover.gibbonPersonID=gibbonPerson.gibbonPersonID) WHERE status='Full'";
+                    $result = $connection2->prepare($sql);
+                    $result->execute($data);
+                } catch (PDOException $e) {
+                }
+
                 if ($result->rowCount() < 1) {
                     $page->addError(__('An error has occurred with your expense and budget settings.'));
                 } else {
@@ -113,14 +117,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Finance/expenses_manage.ph
                         }
                     }
                     if ($gibbonFinanceBudgetCycleID != '') {
-                            $result = $container->get(FinanceBudgetCycleGateway::class)->getByID($gibbonFinanceBudgetCycleID);
-
-                        if (empty($result)) {
+                        
+                            $data = array('gibbonFinanceBudgetCycleID' => $gibbonFinanceBudgetCycleID);
+                            $sql = 'SELECT * FROM gibbonFinanceBudgetCycle WHERE gibbonFinanceBudgetCycleID=:gibbonFinanceBudgetCycleID';
+                            $result = $connection2->prepare($sql);
+                            $result->execute($data);
+                        if ($result->rowcount() != 1) {
                             echo "<div class='error'>";
                             echo __('The specified budget cycle cannot be determined.');
                             echo '</div>';
                         } else {
-                            $row = $result;
+                            $row = $result->fetch();
                             $gibbonFinanceBudgetCycleName = $row['name'];
                         }
 

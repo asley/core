@@ -75,10 +75,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Library/report_studentBorr
         $table->setTitle(__('Report Data'));
         $table->modifyRows(function ($item, $row) {
             if ($item['status'] == 'On Loan') {
-                return $item['pastDue'] == 'Y' ? $row->addClass('error') : $row->addClass('success');
+                return $item['pastDue'] == 'Y' ? $row->addClass('error') : $row;
             }
-            if ($item['status'] == 'Reserved') $row->addClass('message');
-            if ($item['status'] == 'Decommissioned' || $item['status'] == 'Lost') $row->addClass('error');
             return $row;
         });
         $table

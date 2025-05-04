@@ -42,8 +42,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Library/library_manage_she
         return;
     }
 
-    $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/Library/library_manage_shelves_deleteProcess.php', true);
-    $form->addHiddenValue('gibbonLibraryShelfID', $gibbonLibraryShelfID);
+    $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/Library/library_manage_shelves_deleteProcess.php?gibbonLibraryShelfID='.$gibbonLibraryShelfID, true);
     echo $form->getOutput();
 
 }

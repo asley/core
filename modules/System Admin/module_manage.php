@@ -26,6 +26,23 @@ use Gibbon\Domain\System\ModuleGateway;
 
 require_once __DIR__ . '/moduleFunctions.php';
 
+// Get the current Gibbon version from database
+try {
+    $data = array();
+    $sql = "SELECT value FROM gibbonSetting WHERE scope='System' AND name='version'";
+    $result = $connection2->prepare($sql);
+    $result->execute($data);
+    if ($result->rowCount() == 1) {
+        $row = $result->fetch();
+        $version = $row['value'];
+    } else {
+        $version = 'Unknown';
+    }
+} catch (PDOException $e) {
+    $version = 'Unknown';
+    error_log('Error getting version: ' . $e->getMessage());
+}
+
 if (isActionAccessible($guid, $connection2, '/modules/System Admin/module_manage.php') == false) {
     // Access denied
     $page->addError(__('You do not have access to this action.'));
@@ -77,12 +94,24 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/module_manage
         if ($module['type'] == 'Additional') {
             $versionFromFile = getModuleVersion($module['name'], $guid);
             
-            if (!empty($versionFromFile['coreVersion']) && version_compare($versionFromFile['coreVersion'], $version, '>')) {
-                $module['status'] = Format::bold(__('Requires {version}', ['version' => 'v'.$versionFromFile['coreVersion']])).'<br/>';
-                $module['warning'] = true;
-            } else if (version_compare($versionFromFile['moduleVersion'], $module['version'], '>')) {
-                $module['status'] = Format::bold(__('Update Available')).'<br/>';
-                $module['update'] = true;
+            if (!empty($versionFromFile['coreVersion'])) {
+                $coreVersionRequired = str_replace('v', '', $versionFromFile['coreVersion']);
+                $currentVersion = str_replace('v', '', $version);
+                
+                if (strcmp($coreVersionRequired, $currentVersion) > 0) {
+                    $module['status'] = Format::bold(__('Requires {version}', ['version' => 'v'.$versionFromFile['coreVersion']])).'<br/>';
+                    $module['warning'] = true;
+                }
+            }
+            
+            if (!empty($versionFromFile['moduleVersion'])) {
+                $moduleVersionFile = str_replace('v', '', $versionFromFile['moduleVersion']);
+                $moduleVersionCurrent = str_replace('v', '', $module['version']);
+                
+                if (strcmp($moduleVersionFile, $moduleVersionCurrent) > 0) {
+                    $module['status'] = Format::bold(__('Update Available')).'<br/>';
+                    $module['update'] = true;
+                }
             }
         }
     });

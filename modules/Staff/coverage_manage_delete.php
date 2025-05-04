@@ -42,7 +42,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Staff/coverage_manage_dele
         return;
     }
 
-    $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/Staff/coverage_manage_deleteProcess.php', true);
-    $form->addHiddenValue('gibbonStaffCoverageID', $gibbonStaffCoverageID);
+    $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/Staff/coverage_manage_deleteProcess.php?gibbonStaffCoverageID='.$gibbonStaffCoverageID, true);
     echo $form->getOutput();
 }

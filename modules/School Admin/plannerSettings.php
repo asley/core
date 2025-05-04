@@ -38,24 +38,24 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/plannerSettin
     $settingGateway = $container->get(SettingGateway::class);
 
     $setting = $settingGateway->getSettingByScope('Planner', 'lessonDetailsTemplate', true);
-    $col = $form->addRow()->addColumn();
-        $col->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
-        $col->addEditor($setting['name'], $guid)->setRows(10)->setValue($setting['value']);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
+        $row->addTextArea($setting['name'])->setRows(10)->setValue($setting['value']);
 
     $setting = $settingGateway->getSettingByScope('Planner', 'teachersNotesTemplate', true);
-    $col = $form->addRow()->addColumn();
-        $col->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
-        $col->addEditor($setting['name'], $guid)->setRows(10)->setValue($setting['value']);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
+        $row->addTextArea($setting['name'])->setRows(10)->setValue($setting['value']);
 
     $setting = $settingGateway->getSettingByScope('Planner', 'unitOutlineTemplate', true);
-    $col = $form->addRow()->addColumn();
-        $col->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
-        $col->addEditor($setting['name'], $guid)->setRows(10)->setValue($setting['value']);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
+        $row->addTextArea($setting['name'])->setRows(10)->setValue($setting['value']);
 
     $setting = $settingGateway->getSettingByScope('Planner', 'smartBlockTemplate', true);
-    $col = $form->addRow()->addColumn();
-        $col->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
-        $col->addEditor($setting['name'], $guid)->setRows(10)->setValue($setting['value']);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
+        $row->addTextArea($setting['name'])->setRows(10)->setValue($setting['value']);
 
     $form->addRow()->addHeading('Interface', __('Interface'));
     

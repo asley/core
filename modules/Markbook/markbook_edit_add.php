@@ -137,9 +137,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Markbook/markbook_edit_add
 
                 $row = $form->addRow();
                     $row->addLabel('description', __('Description'));
-                    $col = $row->addColumn('description');
-                    $col->addTextField('description')->required()->maxLength(1000)->setValue($summary);
-                    $col->addColor('columnColor')->hideField()->setPalette('background')->addClass('ml-2');
+                    $row->addTextField('description')->required()->maxLength(1000)->setValue($summary);
 
                 // TYPE
                 $types = $settingGateway->getSettingByScope('Markbook', 'markbookType');

@@ -24,8 +24,8 @@ use Gibbon\Domain\Forms\FormFieldGateway;
 
 require_once '../../gibbon.php';
 
-$gibbonFormID = $_POST['gibbonFormID'] ?? '';
-$gibbonFormPageID = $_POST['gibbonFormPageID'] ?? '';
+$gibbonFormID = $_GET['gibbonFormID'] ?? '';
+$gibbonFormPageID = $_GET['gibbonFormPageID'] ?? '';
 
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/System Admin/formBuilder_edit.php&gibbonFormID='.$gibbonFormID;
 

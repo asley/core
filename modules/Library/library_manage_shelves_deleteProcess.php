@@ -24,7 +24,7 @@ use Gibbon\Domain\Library\LibraryShelfItemGateway;
 
 require_once '../../gibbon.php';
 
-$gibbonLibraryShelfID = $_POST['gibbonLibraryShelfID'] ?? '';
+$gibbonLibraryShelfID = $_GET['gibbonLibraryShelfID'] ?? '';
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/Library/library_manage_shelves.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Library/library_manage_shelves_delete.php') == false) {

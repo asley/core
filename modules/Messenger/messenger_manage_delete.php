@@ -54,8 +54,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Messenger/messenger_manage
             if ($result->rowCount() != 1) {
                 $page->addError(__('The specified record cannot be found.'));
             } else {
-                $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/messenger_manage_deleteProcess.php?search=$search");
-                $form->addHiddenValue('gibbonMessengerID', $gibbonMessengerID);
+                $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/messenger_manage_deleteProcess.php?gibbonMessengerID=$gibbonMessengerID&search=$search");
                 echo $form->getOutput();
             }
         }

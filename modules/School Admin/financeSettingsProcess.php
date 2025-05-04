@@ -68,8 +68,6 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/financeSettin
             'purchasingOfficer',
             'reimbursementOfficer',
             'paymentTypeOptions',
-            'pettyCashReasons',
-            'pettyCashDefaultAction',
         ]
     ];
 

@@ -23,7 +23,6 @@ use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Domain\School\SchoolYearGateway;
 use Gibbon\Forms\DatabaseFormFactory;
-use Gibbon\Domain\School\DaysOfWeekGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/School Admin/schoolYearSpecialDay_manage_add.php') == false) {
     // Access denied
@@ -46,12 +45,6 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/schoolYearSpe
     }
     
     $schoolYear = $container->get(SchoolYearGateway::class)->getByID($gibbonSchoolYearID);
-    $day = $container->get(DaysOfWeekGateway::class)->getDayOfWeekByDate(date('Y-m-d', $dateStamp));
-
-    $schoolOpen = $day['schoolOpen'] ?? '';
-    $schoolStart = $day['schoolStart'] ?? '';
-    $schoolEnd = $day['schoolEnd'] ?? '';
-    $schoolClose = $day['schoolClose'] ?? '';
 
     if (empty($schoolYear)) {
         $page->addError(__('The specified record does not exist.'));
@@ -114,26 +107,26 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/schoolYearSpe
     $row = $form->addRow()->addClass('timingChange');
         $row->addLabel('schoolOpen', __('School Opens'));
         $col = $row->addColumn()->addClass('right inline');
-        $col->addSelect('schoolOpenH')->fromString($hours)->setClass('shortWidth')->placeholder(__('Hours'))->selected(substr($schoolOpen, 0, 2));
-        $col->addSelect('schoolOpenM')->fromString($minutes)->setClass('shortWidth')->placeholder(__('Minutes'))->selected(substr($schoolOpen, 3, 2));
+        $col->addSelect('schoolOpenH')->fromString($hours)->setClass('shortWidth')->placeholder(__('Hours'));
+        $col->addSelect('schoolOpenM')->fromString($minutes)->setClass('shortWidth')->placeholder(__('Minutes'));
 
     $row = $form->addRow()->addClass('timingChange');
         $row->addLabel('schoolStart', __('School Starts'));
         $col = $row->addColumn()->addClass('right inline');
-        $col->addSelect('schoolStartH')->fromString($hours)->setClass('shortWidth')->placeholder(__('Hours'))->selected(substr($schoolStart, 0, 2));
-        $col->addSelect('schoolStartM')->fromString($minutes)->setClass('shortWidth')->placeholder(__('Minutes'))->selected(substr($schoolStart, 3, 2));
+        $col->addSelect('schoolStartH')->fromString($hours)->setClass('shortWidth')->placeholder(__('Hours'));
+        $col->addSelect('schoolStartM')->fromString($minutes)->setClass('shortWidth')->placeholder(__('Minutes'));
 
     $row = $form->addRow()->addClass('timingChange');
         $row->addLabel('schoolEnd', __('School Ends'));
         $col = $row->addColumn()->addClass('right inline');
-        $col->addSelect('schoolEndH')->fromString($hours)->setClass('shortWidth')->placeholder(__('Hours'))->selected(substr($schoolEnd, 0, 2));
-        $col->addSelect('schoolEndM')->fromString($minutes)->setClass('shortWidth')->placeholder(__('Minutes'))->selected(substr($schoolEnd, 3, 2));
+        $col->addSelect('schoolEndH')->fromString($hours)->setClass('shortWidth')->placeholder(__('Hours'));
+        $col->addSelect('schoolEndM')->fromString($minutes)->setClass('shortWidth')->placeholder(__('Minutes'));
 
     $row = $form->addRow()->addClass('timingChange');
         $row->addLabel('schoolClose', __('School Closes'));
         $col = $row->addColumn()->addClass('right inline');
-        $col->addSelect('schoolCloseH')->fromString($hours)->setClass('shortWidth')->placeholder(__('Hours'))->selected(substr($schoolClose, 0, 2));
-        $col->addSelect('schoolCloseM')->fromString($minutes)->setClass('shortWidth')->placeholder(__('Minutes'))->selected(substr($schoolClose, 3, 2));
+        $col->addSelect('schoolCloseH')->fromString($hours)->setClass('shortWidth')->placeholder(__('Hours'));
+        $col->addSelect('schoolCloseM')->fromString($minutes)->setClass('shortWidth')->placeholder(__('Minutes'));
 
     $form->toggleVisibilityByClass('cancelActivities')->onSelect('type')->when(['Timing Change', 'Off Timetable']);
     $row = $form->addRow()->addClass('cancelActivities');

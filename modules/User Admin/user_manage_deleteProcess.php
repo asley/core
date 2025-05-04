@@ -23,7 +23,7 @@ use Gibbon\Domain\User\PersonalDocumentGateway;
 
 include '../../gibbon.php';
 
-$gibbonPersonID = $_POST['gibbonPersonID'] ?? '';
+$gibbonPersonID = $_GET['gibbonPersonID'] ?? '';
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/user_manage_delete.php&gibbonPersonID='.$gibbonPersonID.'&search='.$_GET['search'];
 $URLDelete = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/user_manage.php&search='.$_GET['search'];
 

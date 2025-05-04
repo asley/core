@@ -23,7 +23,7 @@ use Gibbon\Domain\User\PersonalDocumentTypeGateway;
 
 require_once '../../gibbon.php';
 
-$gibbonPersonalDocumentTypeID = $_POST['gibbonPersonalDocumentTypeID'] ?? '';
+$gibbonPersonalDocumentTypeID = $_GET['gibbonPersonalDocumentTypeID'] ?? '';
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/User Admin/personalDocumentSettings.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/User Admin/personalDocumentSettings_manage_delete.php') == false) {

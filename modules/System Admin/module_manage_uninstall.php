@@ -88,7 +88,13 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/module_manage
                     if (strtoupper($tokens[0]) == 'CREATE' && (strtoupper($tokens[1]) == 'TABLE' || strtoupper($tokens[1]) == 'VIEW')) {
                         $type = ucfirst(strtolower($tokens[1]));
                         $name = str_replace('`', '', $tokens[2]);
-                        $group[$type.'-'.$name] = Format::bold(__($type)).': '.$name;
+                        
+                        // Get translation and ensure it's a string
+                        $translation = __($type);
+                        $typeLabel = (is_array($translation) || !is_string($translation)) ? $type : $translation;
+                        
+                        // Create the formatted string
+                        $group[$type.'-'.$name] = '<b>' . htmlspecialchars($typeLabel) . '</b>: ' . htmlspecialchars($name);
                     }
         
                     return $group;

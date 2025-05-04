@@ -27,10 +27,10 @@ $queryArr = [
   "q" => "/modules/".getModuleName($_POST['address'])."/library_manage_catalog_delete.php",
   "gibbonLibraryItemID" => $_POST['gibbonLibraryItemID'] ?? '',
   "name" => $_GET['name'] ?? '',
-  "gibbonLibraryTypeID" => $_POST['gibbonLibraryTypeID'] ?? '',
-  "gibbonSpaceID" => $_POST['gibbonSpaceID'] ?? '',
+  "gibbonLibraryTypeID" => $_GET['gibbonLibraryTypeID'] ?? '',
+  "gibbonSpaceID" => $_GET['gibbonSpaceID'] ?? '',
   "status" => $_GET['space'] ?? '',
-  "gibbonPersonIDOwnership" => $_POST['gibbonPersonIDOwnership'] ?? '',
+  "gibbonPersonIDOwnership" => $_GET['gibbonPersonIDOwnership'] ?? '',
   "typeSpecificfields" => $_GET['typeSpecificFields'] ?? ''
 ];
 $baseURL = $session->get('absoluteURL').'/index.php?';

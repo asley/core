@@ -23,7 +23,7 @@ use Gibbon\Domain\Admissions\AdmissionsAccountGateway;
 
 require_once '../../gibbon.php';
 
-$gibbonAdmissionsAccountID = $_POST['gibbonAdmissionsAccountID'] ?? '';
+$gibbonAdmissionsAccountID = $_GET['gibbonAdmissionsAccountID'] ?? '';
 $search = $_REQUEST['search'] ?? '';
 
 $URL = $session->get('absoluteURL')."/index.php?q=/modules/Admissions/admissions_manage.php&search=$search";

@@ -41,7 +41,6 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/customFields_
         return;
     }
 
-    $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/customFields_deleteProcess.php");
-    $form->addHiddenValue('gibbonCustomFieldID', $gibbonCustomFieldID);
+    $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/customFields_deleteProcess.php?gibbonCustomFieldID=$gibbonCustomFieldID");
     echo $form->getOutput();
 }

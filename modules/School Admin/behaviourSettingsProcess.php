@@ -37,7 +37,6 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/behaviourSett
     $enablePositiveBehaviourLetters = $_POST['enablePositiveBehaviourLetters'] ?? '';
     $positiveDescriptors = '';
     $negativeDescriptors = '';
-    $observationDescriptors = '';
     if ($enableDescriptors == 'Y') {
         foreach (explode(',', $_POST['positiveDescriptors']) as $descriptor) {
             $positiveDescriptors .= trim($descriptor).',';
@@ -48,11 +47,6 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/behaviourSett
             $negativeDescriptors .= trim($descriptor).',';
         }
         $negativeDescriptors = substr($negativeDescriptors, 0, -1);
-
-        foreach (explode(',', $_POST['observationDescriptors']) as $descriptor) {
-            $observationDescriptors .= trim($descriptor).',';
-        }
-        $observationDescriptors = substr($observationDescriptors, 0, -1);
     }
     $levels = '';
     if ($enableLevels == 'Y') {
@@ -83,7 +77,7 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/behaviourSett
         $fail = false;
 
         try {
-            $data = ['value' => $enableDescriptors];
+            $data = array('value' => $enableDescriptors);
             $sql = "UPDATE gibbonSetting SET value=:value WHERE scope='Behaviour' AND name='enableDescriptors'";
             $result = $connection2->prepare($sql);
             $result->execute($data);
@@ -92,7 +86,7 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/behaviourSett
         }
         if ($enableDescriptors == 'Y') {
             try {
-                $data = ['value' => $positiveDescriptors];
+                $data = array('value' => $positiveDescriptors);
                 $sql = "UPDATE gibbonSetting SET value=:value WHERE scope='Behaviour' AND name='positiveDescriptors'";
                 $result = $connection2->prepare($sql);
                 $result->execute($data);
@@ -101,17 +95,8 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/behaviourSett
             }
 
             try {
-                $data = ['value' => $negativeDescriptors];
+                $data = array('value' => $negativeDescriptors);
                 $sql = "UPDATE gibbonSetting SET value=:value WHERE scope='Behaviour' AND name='negativeDescriptors'";
-                $result = $connection2->prepare($sql);
-                $result->execute($data);
-            } catch (PDOException $e) {
-                $fail = true;
-            }
-
-            try {
-                $data = ['value' => $observationDescriptors];
-                $sql = "UPDATE gibbonSetting SET value=:value WHERE scope='Behaviour' AND name='observationDescriptors'";
                 $result = $connection2->prepare($sql);
                 $result->execute($data);
             } catch (PDOException $e) {

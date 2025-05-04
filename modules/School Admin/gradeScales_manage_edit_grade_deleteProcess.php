@@ -21,8 +21,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 include '../../gibbon.php';
 
-$gibbonScaleGradeID = $_POST['gibbonScaleGradeID'] ?? '';
-$gibbonScaleID = $_POST['gibbonScaleID'] ?? '';
+$gibbonScaleGradeID = $_GET['gibbonScaleGradeID'] ?? '';
+$gibbonScaleID = $_GET['gibbonScaleID'] ?? '';
 
 if ($gibbonScaleID == '') { echo 'Fatal error loading this page!';
 } else {

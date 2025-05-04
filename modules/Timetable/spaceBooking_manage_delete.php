@@ -52,8 +52,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Timetable/spaceBooking_man
             if ($result->rowCount() != 1) {
                 $page->addError(__('The specified record cannot be found.'));
             } else {
-                $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/spaceBooking_manage_deleteProcess.php");
-                $form->addHiddenValue('gibbonTTSpaceBookingID', $gibbonTTSpaceBookingID);
+                $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/spaceBooking_manage_deleteProcess.php?gibbonTTSpaceBookingID=$gibbonTTSpaceBookingID");
                 echo $form->getOutput();
             }
         }

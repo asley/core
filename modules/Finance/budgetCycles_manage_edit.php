@@ -21,7 +21,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Forms\Form;
 use Gibbon\Forms\DatabaseFormFactory;
-use Gibbon\Domain\Finance\FinanceBudgetCycleGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Finance/budgetCycles_manage_edit.php') == false) {
     // Access denied
@@ -37,13 +36,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Finance/budgetCycles_manag
     if ($gibbonFinanceBudgetCycleID == '') {
         $page->addError(__('You have not specified one or more required parameters.'));
     } else {
-            $result = $container->get(FinanceBudgetCycleGateway::class)->getByID($gibbonFinanceBudgetCycleID);
 
-        if (empty($result)) {
+            $data = array('gibbonFinanceBudgetCycleID' => $gibbonFinanceBudgetCycleID);
+            $sql = 'SELECT * FROM gibbonFinanceBudgetCycle WHERE gibbonFinanceBudgetCycleID=:gibbonFinanceBudgetCycleID';
+            $result = $connection2->prepare($sql);
+            $result->execute($data);
+
+        if ($result->rowCount() != 1) {
             $page->addError(__('The specified record cannot be found.'));
         } else {
             //Let's go!
-            $values = $result;
+            $values = $result->fetch();
 
             $form = Form::create('budgetCycle', $session->get('absoluteURL').'/modules/'.$session->get('module').'/budgetCycles_manage_editProcess.php?gibbonFinanceBudgetCycleID='.$gibbonFinanceBudgetCycleID);
             $form->setFactory(DatabaseFormFactory::create($pdo));

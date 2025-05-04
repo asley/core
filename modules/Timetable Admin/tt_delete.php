@@ -41,9 +41,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Timetable Admin/tt_delete.
             $page->addError(__('The specified record cannot be found.'));
         } else {
             //Let's go!
-            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/tt_deleteProcess.php", true);
-            $form->addHiddenValue('gibbonTTID', $gibbonTTID);
-            $form->addHiddenValue('gibbonSchoolYearID', $$_GET['gibbonSchoolYearID']);
+            $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/'.$session->get('module')."/tt_deleteProcess.php?gibbonTTID=$gibbonTTID&gibbonSchoolYearID=".$_GET['gibbonSchoolYearID'], true);
             echo $form->getOutput();
         }
     }

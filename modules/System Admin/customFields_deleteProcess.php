@@ -23,7 +23,7 @@ use Gibbon\Domain\System\CustomFieldGateway;
 
 include '../../gibbon.php';
 
-$gibbonCustomFieldID = $_POST['gibbonCustomFieldID'] ?? '';
+$gibbonCustomFieldID = $_GET['gibbonCustomFieldID'] ?? '';
 
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/customFields.php';
 

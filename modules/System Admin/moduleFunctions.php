@@ -22,6 +22,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 use GuzzleHttp\Client;
 use Gibbon\Domain\System\I18nGateway;
 use Psr\Container\ContainerInterface;
+use Gibbon\Domain\System\ModuleGateway;
+use Gibbon\Domain\DataSet;
+use Gibbon\Tables\DataTable;
+use Gibbon\Services\Format;
 
 //Sets the sequence numbers appropriately for a given first day of the week (either Sunday or Monday)
 function setFirstDayOfTheWeek($connection2, $fdotw, $databaseName)
@@ -109,7 +113,7 @@ function setFirstDayOfTheWeek($connection2, $fdotw, $databaseName)
 }
 
 /**
- * Load the module manifest into an array. Handling the include in a function keeps the variable scope contained.
+ * Load the module manifest into an array.
  * @param string $moduleName
  * @param string $guid
  * @return array
@@ -126,7 +130,17 @@ function getModuleManifest($moduleName, $guid)
         $manifestOK = ($name == $moduleName);
     }
 
-    return compact('name', 'description', 'entryURL', 'type', 'category', 'version', 'author', 'url', 'manifestOK');
+    return [
+        'name' => $name,
+        'description' => $description,
+        'entryURL' => $entryURL,
+        'type' => $type,
+        'category' => $category,
+        'version' => $version,
+        'author' => $author,
+        'url' => $url,
+        'manifestOK' => $manifestOK
+    ];
 }
 
 /**
@@ -134,18 +148,23 @@ function getModuleManifest($moduleName, $guid)
  *
  * @param string $moduleName
  * @param string $guid
- * @return string
+ * @return array|bool
  */
 function getModuleVersion($moduleName, $guid)
 {
     global $session;
+    $moduleVersion = '';
+    $coreVersion = '';
+    
     $versionFile = $session->get('absolutePath').'/modules/'.$moduleName.'/version.php';
     if (is_file($versionFile)) {
         include $versionFile;
-       return ['moduleVersion' => $moduleVersion, 'coreVersion' => ($coreVersion ?? '')];
-    } else {
-        return false;
+        return [
+            'moduleVersion' => $moduleVersion ?? '',
+            'coreVersion' => $coreVersion ?? ''
+        ];
     }
+    return false;
 }
 
 /**

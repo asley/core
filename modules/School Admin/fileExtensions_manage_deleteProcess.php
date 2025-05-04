@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 include '../../gibbon.php';
 
-$gibbonFileExtensionID = $_POST['gibbonFileExtensionID'] ?? '';
+$gibbonFileExtensionID = $_GET['gibbonFileExtensionID'] ?? '';
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/fileExtensions_manage_delete.php&gibbonFileExtensionID='.$gibbonFileExtensionID;
 $URLDelete = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/fileExtensions_manage.php';
 

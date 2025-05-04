@@ -41,7 +41,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Admissions/applications_ma
         return;
     }
 
-    $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/Admissions/applications_manage_deleteProcess.php', true);
-    $form->addHiddenValue('gibbonAdmissionsApplicationID', $gibbonAdmissionsApplicationID);
+    $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/Admissions/applications_manage_deleteProcess.php?gibbonAdmissionsApplicationID='.$gibbonAdmissionsApplicationID, true);
     echo $form->getOutput();
 }

@@ -23,10 +23,11 @@ use Gibbon\Domain\IndividualNeeds\INInvestigationGateway;
 
 require_once '../../gibbon.php';
 
-$gibbonPersonID = $_POST['gibbonPersonID'] ?? '';
-$gibbonFormGroupID = $_POST['gibbonFormGroupID'] ?? '';
-$gibbonYearGroupID = $_POST['gibbonYearGroupID'] ?? '';
-$gibbonINInvestigationID = $_POST['gibbonINInvestigationID'] ?? '';
+$gibbonPersonID = $_GET['gibbonPersonID'] ?? '';
+$gibbonFormGroupID = $_GET['gibbonFormGroupID'] ?? '';
+$gibbonYearGroupID = $_GET['gibbonYearGroupID'] ?? '';
+
+$gibbonINInvestigationID = $_GET['gibbonINInvestigationID'] ?? '';
 
 $URL = $session->get('absoluteURL')."/index.php?q=/modules/Individual Needs/investigations_manage.php&gibbonPersonID=$gibbonPersonID&gibbonFormGroupID=$gibbonFormGroupID&gibbonYearGroupID=$gibbonYearGroupID";
 

@@ -23,7 +23,7 @@ use Gibbon\Domain\Staff\StaffDutyPersonGateway;
 
 include '../../gibbon.php';
 
-$gibbonStaffDutyPersonID = $_POST['gibbonStaffDutyPersonID'] ?? '';
+$gibbonStaffDutyPersonID = $_GET['gibbonStaffDutyPersonID'] ?? '';
 
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/Staff/staff_duty.php';
 

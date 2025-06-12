@@ -40,6 +40,7 @@ v30.0.00
         Staff: limited Add Staff list to users who are not already staff but have a staff role
         System: updated SpreadsheetRenderer to support exporting data from multiple DataTables
         Timetable: added coverage details for staff duty and activities on the timetable
+        User Admin: added Sibling as option to Emergency Relationship select
 
     Bug Fixes
         Staff: fixed coverage longer than one week not including staff duty and activity cover

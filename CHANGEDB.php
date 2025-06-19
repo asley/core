@@ -947,4 +947,6 @@ $sql[$count][0] = '30.0.00';
 $sql[$count][1] = "
 ALTER TABLE `gibbonReportPrototypeSection` ADD `gibbonPersonIDLastEdit` INT(10) UNSIGNED ZEROFILL NULL;end
 ALTER TABLE `gibbonReportPrototypeSection` ADD `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;end
+UPDATE gibbonSetting SET nameDisplay='Catalyst License Organisation Name', description='Name of organisation on your Catalyst License' WHERE nameDisplay='gibbonedu.com Organisation Name';end
+UPDATE gibbonSetting SET nameDisplay='Catalyst License Key', description='Organisation\'s private key, as registered on your Catalyst License' WHERE nameDisplay='gibbonedu.com Organisation Key';end
 ";

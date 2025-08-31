@@ -951,5 +951,7 @@ UPDATE gibbonSetting SET nameDisplay='Catalyst License Organisation Name', descr
 UPDATE gibbonSetting SET nameDisplay='Catalyst License Key', description='Organisation\'s private key, as registered on your Catalyst License' WHERE nameDisplay='gibbonedu.com Organisation Key';end
 INSERT INTO `gibbonSetting` (`scope`, `name`, `nameDisplay`, `description`, `value`) VALUES ('Staff', 'staffDutyTypes', 'Staff Duty Types', 'A comma-separated list.', 'Supervision,Other');end
 ALTER TABLE `gibbonStaffDuty` ADD `type` VARCHAR(40) NOT NULL DEFAULT 'Other' AFTER `nameShort`;end
+INSERT INTO `gibbonAction` (`gibbonModuleID`, `name`, `precedence`, `category`, `description`, `helpURL`, `URLList`, `entryURL`, `entrySidebar`, `menuShow`, `defaultPermissionAdmin`, `defaultPermissionTeacher`, `defaultPermissionStudent`, `defaultPermissionParent`, `defaultPermissionSupport`, `categoryPermissionStaff`, `categoryPermissionStudent`, `categoryPermissionParent`, `categoryPermissionOther`) VALUES((SELECT gibbonModuleID FROM gibbonModule WHERE name='Activities'), 'Explore Activities_registerByParent', 2, 'Activities', 'Allows parents to view activities and register for their children', NULL, 'explore.php,explore_category.php,explore_activity.php,explore_activity_signUp.php', 'explore.php', 'Y', 'Y', 'N', 'N', 'N', 'Y', 'N', 'N', 'N', 'Y', 'N');end
+ALTER TABLE `gibbonActivityCategory` ADD `gibbonYearGroupIDParentRegister` VARCHAR(255) NULL AFTER `accessEnrolmentDate`;end
 
 ";

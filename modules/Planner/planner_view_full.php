@@ -449,7 +449,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Planner/planner_view_full.
                             $description = Format::alert(__('This lesson has not had any content assigned to it.'));
                         }
 
-                        if (!empty($values['teachersNotes']) and ($highestAction == 'Lesson Planner_viewAllEditMyClasses' or $highestAction == 'Lesson Planner_viewEditAllClasses') and ($values['role'] == 'Teacher' or $values['role'] == 'Assistant' or $values['role'] == 'Technician')) {
+                        if (!empty($values['teachersNotes']) && ($highestAction == 'Lesson Planner_viewEditAllClasses' || ($highestAction == 'Lesson Planner_viewAllEditMyClasses' && ($values['role'] == 'Teacher' || $values['role'] == 'Assistant' || $values['role'] == 'Technician')) )) {
                             $description .= '<div x-cloak x-show="globalShowHide" x-transition id="teachersNotes" class="unit-block rounded p-8 mb-4 border bg-blue-50 text-gray-700"><h3 class="m-0">'.__('Teacher\'s Notes').'</h3>'.$values['teachersNotes'].'</div>';
                         }
 
@@ -1146,9 +1146,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Planner/planner_view_full.
                         $gibbonCourseClassID = $values['gibbonCourseClassID'];
                         $columns = 2;
 
-                        $highestAction = getHighestGroupedAction($guid, '/modules/Students/student_view_details.php', $connection2);
+                        $highestProfileAction = getHighestGroupedAction($guid, '/modules/Students/student_view_details.php', $connection2);
 
-                        $canAccessProfile = ($highestAction == 'View Student Profile_brief' || $highestAction == 'View Student Profile_full' || $highestAction == 'View Student Profile_fullNoNotes' || $highestAction == 'View Student Profile_fullEditAllNotes') ;
+                        $canAccessProfile = ($highestProfileAction == 'View Student Profile_brief' || $highestProfileAction == 'View Student Profile_full' || $highestProfileAction == 'View Student Profile_fullNoNotes' || $highestProfileAction == 'View Student Profile_fullEditAllNotes') ;
 
                         // Only show certain options if Class Attendance is Enabled school-wide, and for this particular class
                         $attendanceEnabled = $values['attendance'] == 'Y';
@@ -1234,7 +1234,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Planner/planner_view_full.
                         // Display attendance grid
                         $count = 0;
 
-                        $canViewConfidential = ($highestAction == 'View Student Profile_full' || $highestAction == 'View Student Profile_fullNoNotes' || $highestAction == 'View Student Profile_fullEditAllNotes');
+                        $canViewConfidential = ($highestProfileAction == 'View Student Profile_full' || $highestProfileAction == 'View Student Profile_fullNoNotes' || $highestProfileAction == 'View Student Profile_fullEditAllNotes');
+                        $teacherViewOnlyAccess = $highestAction == 'Lesson Planner_viewAllEditMyClasses' || $highestAction == "Lesson Planner_viewEditAllClasses";
 
                         foreach ($participants as $person) {
                             $form->addHiddenValue($count . '-gibbonPersonID', $person['gibbonPersonID']);
@@ -1245,7 +1246,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Planner/planner_view_full.
                                 ->addClass($person['cellHighlight'] ?? '');
 
                             // Display alerts and birthdays, teacher only
-                            if ($person['role'] == 'Student' && $values['role'] == 'Teacher' && $teacher == true) {
+                            if ($person['role'] == 'Student' && $values['role'] == 'Teacher' && ($teacher || $teacherViewOnlyAccess)) {
                                 $alert = getAlertBar($guid, $connection2, $person['gibbonPersonID'], $person['privacy'], "x-cloak x-show='globalShowHide'");
                             }
 

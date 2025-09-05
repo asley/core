@@ -23,6 +23,7 @@ v30.0.00
 --------
 
     Headlines
+        Added a new Alerts module to manage automatic and manual student alerts
 
     Security
 
@@ -39,6 +40,7 @@ v30.0.00
         Planner: added a highlight for Off Timetable students in View Lesson Plan attendance list
         Planner: added a button to access Linked Markbook from Edit Lesson Plan page
         Planner: added a highlight for Off Timetable Lessons in the "Year Overview" mode
+        Planner: restricted visibility of user photos in Lesson Plans based on planner access permissions
         Reports: updated Attendance data source to handle Off Timetable days where no attendance is taken
         Reports: prevented deletion of template assets that are not set to inactive
         Reports: added a way for tracking and displaying who last edited an asset

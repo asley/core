@@ -27,6 +27,7 @@ v30.0.00
     Security
 
     Changes With Important Notices
+        Added a Pastoral heading to the main menu and moved Behaviour, Attendance and Individual Needs
 
     Tweaks & Additions
         System: updated SpreadsheetRenderer to support exporting data from multiple DataTables

@@ -690,6 +690,51 @@ INSERT INTO `gibbonAlertLevel` (`gibbonAlertLevelID`, `name`, `nameShort`, `colo
 (002, 'Medium', 'M', '#FF7414', '#FFD2A9', 'Moderate severity, requiring intermediate level of readiness, action, individual support or differentiation.', 2),
 (003, 'Low', 'L', '#939090', '#dddddd', 'Low severity, requiring little to no readiness, action, individual support or differentiation.', 1);
 
+
+--
+-- Table structure for table `gibbonAlert`
+--
+
+CREATE TABLE `gibbonAlert` (
+  `gibbonAlertID` int(12) UNSIGNED ZEROFILL NOT NULL,
+  `gibbonSchoolYearID` int NOT NULL,
+  `gibbonPersonID` int NOT NULL,
+  `gibbonAlertLevelID` int NOT NULL,
+  `context` enum('Automatic','Manual') NOT NULL DEFAULT 'Automatic',
+  `type` varchar(60) NOT NULL,
+  `status` enum('Pending','Approved','Declined') NOT NULL DEFAULT 'Pending',
+  `level` varchar(60) NOT NULL,
+  `dateStart` date DEFAULT NULL,
+  `dateEnd` date DEFAULT NULL,
+  `comment` text,
+  `timestampCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `gibbonPersonIDCreator` int(10) UNSIGNED ZEROFILL NOT NULL,
+  `gibbonPersonIDApproval` int(10) UNSIGNED ZEROFILL DEFAULT NULL,
+  `notesApproval` text,
+  `timestampApproval` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `gibbonAlert`
+--
+ALTER TABLE `gibbonAlert`
+  ADD PRIMARY KEY (`gibbonAlertID`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `gibbonAlert`
+--
+ALTER TABLE `gibbonAlert`
+  MODIFY `gibbonAlertID` int(12) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT;
+COMMIT;
+
 -- --------------------------------------------------------
 
 --

@@ -42,6 +42,7 @@ v30.0.00
         Planner: added a highlight for Off Timetable students in View Lesson Plan attendance list
         Planner: added a button to access Linked Markbook from Edit Lesson Plan page
         Planner: added a highlight for Off Timetable Lessons in the "Year Overview" mode
+        Planner: added the option to use smart block names as lesson names in Deploy Lessons
         Planner: restricted visibility of user photos in Lesson Plans based on planner access permissions
         Reports: updated Attendance data source to handle Off Timetable days where no attendance is taken
         Reports: prevented deletion of template assets that are not set to inactive

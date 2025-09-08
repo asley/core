@@ -28,7 +28,7 @@ use Gibbon\Domain\Students\MedicalGateway;
 use Gibbon\Domain\System\AlertLevelGateway;
 use Gibbon\Domain\Behaviour\BehaviourGateway;
 use Gibbon\Domain\Markbook\MarkbookEntryGateway;
-use Gibbon\Domain\IndividualNeeds\inPersonDescriptorGateway;
+use Gibbon\Domain\IndividualNeeds\INPersonDescriptorGateway;
 use Gibbon\View\Component;
 
 /**
@@ -57,7 +57,7 @@ class Alert
         SettingGateway $settingGateway,
         AlertLevelGateway $alertLevelGateway,
         MedicalGateway $medicalGateway,
-        inPersonDescriptorGateway $inPersonDescriptorGateway,
+        INPersonDescriptorGateway $inPersonDescriptorGateway,
         MarkbookEntryGateway $markbookEntryGateway,
         BehaviourGateway $behaviourGateway,
         AlertGateway $alertGateway

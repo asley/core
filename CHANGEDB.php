@@ -967,4 +967,5 @@ UPDATE `gibbonModule` SET category='Pastoral' WHERE name='Behaviour' OR name='At
 ALTER TABLE `gibbonAlertType` ADD `type` enum('Core','Additional') NOT NULL DEFAULT 'Additional' AFTER `active`;end
 ALTER TABLE `gibbonAlertType` ADD `sequenceNumber` INT(6) NOT NULL AFTER `description`;end
 ALTER TABLE `gibbonAlert` ADD `gibbonAlertTypeID` INT(6) UNSIGNED ZEROFILL NOT NULL AFTER `gibbonAlertLevelID`;end
+ALTER TABLE `gibbonActivity` ADD `paymentDescription` TEXT NULL AFTER `paymentFirmness`;end
 ";

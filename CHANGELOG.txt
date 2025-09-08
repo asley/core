@@ -34,6 +34,7 @@ v30.0.00
         System: updated SpreadsheetRenderer to support exporting data from multiple DataTables
         System: switched interface strings from Value Added License to Catalyst License
         Activities: added the option for parents to register their children in activities
+        Activities: added a description field to the cost section for activities
         Behaviour: added Add Multiple button to Behaviour tab of student profile
         Individual Needs: enabled viewing IN records for past students as read-only
         Messenger: enabled resending to any recipient when read receipts are off in Send Report

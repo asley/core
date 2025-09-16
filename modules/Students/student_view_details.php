@@ -2471,16 +2471,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Students/student_view_deta
                     $alert = '';
                     //Show alerts
                     if ($highestAction == 'View Student Profile_fullEditAllNotes' || $highestAction == 'View Student Profile_full' || $highestAction == 'View Student Profile_fullNoNotes') {
-                        // $alert = getAlertBar($guid, $connection2, $gibbonPersonID, $row['privacy'], '', false, true);
-                        $alert = $container->get(Alert::class)->getAlertBar($gibbonPersonID, $row['privacy'], '', false, true);
-                        
-                        $sidebarExtra .= '<div class="w-48 sm:w-64 h-10 mb-2">';
-                        if (empty($alert)) {
-                             $sidebarExtra .= '<span class="text-gray-500 text-xs">'.__('No Current Alerts').'</span>';
-                        } else {
-                             $sidebarExtra .= $alert;
-                        }
-                         $sidebarExtra .= '</div>';
+                        $alert = $container->get(Alert::class)->getAlertBar($gibbonPersonID, '', false, true);
+                        $sidebarExtra .= '<div class="w-48 sm:w-64 h-10 mb-2">'.$alert.'</div>';
                     }
                     
                     $sidebarExtra .= Format::userPhoto($studentImage, 240);

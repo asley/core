@@ -23,13 +23,14 @@ use Gibbon\Services\Format;
 use Gibbon\Contracts\Services\Session;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Contracts\Database\Connection;
-use Gibbon\Domain\Alerts\AlertGateway;
+use Gibbon\Domain\StudentAlerts\AlertGateway;
 use Gibbon\Domain\Students\MedicalGateway;
 use Gibbon\Domain\System\AlertLevelGateway;
 use Gibbon\Domain\Behaviour\BehaviourGateway;
 use Gibbon\Domain\Markbook\MarkbookEntryGateway;
 use Gibbon\Domain\IndividualNeeds\INPersonDescriptorGateway;
 use Gibbon\View\Component;
+use Gibbon\Domain\User\UserGateway;
 
 /**
  * Alert class to calculate and get Alerts for Students
@@ -44,18 +45,25 @@ class Alert
     protected $session;
     protected $settingGateway;
     protected $alertLevelGateway;
+    protected $userGateway;
     protected $medicalGateway;
     protected $inPersonDescriptorGateway;
     protected $markbookEntryGateway;
     protected $behaviourGateway;
     protected $alertGateway;
+
+    protected $alertTypes;
+    protected $alertLevels = ['High' => 001, 'Medium' => 002, 'Low' => 003];
     protected $alerts = [];
+
+    protected $days = 60;
 
     public function __construct(
         Connection $db,
         Session $session,
         SettingGateway $settingGateway,
         AlertLevelGateway $alertLevelGateway,
+        UserGateway $userGateway,
         MedicalGateway $medicalGateway,
         INPersonDescriptorGateway $inPersonDescriptorGateway,
         MarkbookEntryGateway $markbookEntryGateway,
@@ -66,11 +74,14 @@ class Alert
         $this->session = $session;
         $this->settingGateway = $settingGateway;
         $this->alertLevelGateway = $alertLevelGateway;
+        $this->userGateway = $userGateway;
         $this->medicalGateway = $medicalGateway;
         $this->inPersonDescriptorGateway = $inPersonDescriptorGateway;
         $this->markbookEntryGateway = $markbookEntryGateway;
         $this->behaviourGateway = $behaviourGateway;
         $this->alertGateway = $alertGateway;
+
+        $this->alertTypes = $this->alertGateway->selectAllAlertTypes()->fetchGroupedUnique();
     }
 
     public function getAlertBar($gibbonPersonID, $privacy = '', $divExtras = '', $div = true, $large = false, $target = "_self") 
@@ -82,20 +93,20 @@ class Alert
         $target = ($target == "_blank") ? "_blank" : "_self";
 
         $highestAction = getHighestGroupedAction($guid, '/modules/Students/student_view_details.php', $connection2);
-        if ($highestAction == 'View Student Profile_full' or $highestAction == 'View Student Profile_fullNoNotes' or $highestAction == 'View Student Profile_fullEditAllNotes') {
+        if ($highestAction == 'View Student Profile_full' || $highestAction == 'View Student Profile_fullNoNotes' || $highestAction == 'View Student Profile_fullEditAllNotes') {
             
-            // Calculate All ALERTS
-            $this->calculateAlerts($gibbonPersonID, $privacy);
+            // Get all alerts for a student
+            $alerts = $this->getStudentAlerts($gibbonPersonID);
+            
+            foreach ($alerts as $alert) {
+                $details = $this->getAlertTextAndLink($gibbonPersonID, $alert['type'], $alert['level'] ?? $privacy);
 
-            if (empty($this->alerts)) {
-                return '';
-            }
-
-            foreach ($this->alerts as $alert) {
-                $output .= Component::render(Alert::class, $alert + [
-                    'large' => $large,
-                    'target' => $target,
-                ]);
+                $output .= Component::render(Alert::class, [
+                    'color'   => $alert['levelColor'] ?? $alert['color'] ?? '#939090',
+                    'colorBG' => $alert['levelColorBG'] ?? $alert['colorBG'] ?? '#dddddd',
+                    'large'   => $large,
+                    'target'  => $target,
+                ] + $details + $alert);
             }
 
             if ($div == true) {
@@ -106,47 +117,71 @@ class Alert
         return $output;
     }
 
-
-    public function calculateAlerts($gibbonPersonID, $privacy = '')
+    public function calculateAlerts($gibbonPersonID)
     {
-        // Individual Needs
+        $this->alerts = [];
+
         $this->calculateIndividualNeedsAlerts($gibbonPersonID);
-
-        // Academic
         $this->calculateAcademicAlerts($gibbonPersonID);
-
-        // Behaviour
         $this->calculateBehaviourAlerts($gibbonPersonID);
-
-        // Medical
         $this->calculateMedicalAlerts($gibbonPersonID);
+        $this->calculatePrivacyAlerts($gibbonPersonID);
 
-        // Privacy
-        $this->calculatePrivacyAlerts($gibbonPersonID, $privacy);
-
-        // Custom
-        $this->calculateCustomAlerts($gibbonPersonID);
-
-        return $this;
+        return $this->alerts;
     }
 
+    public function getAlertType($type)
+    {
+        return $this->alertTypes[$type] ?? [];
+    }
+
+    public function isAlertTypeActive($type)
+    {
+        return !empty($this->alertTypes[$type]) && $this->alertTypes[$type]['active'] == 'Y';
+    }
+
+    protected function getStudentAlerts($gibbonPersonID)
+    {
+        $allAlerts = $this->alertGateway->getAllAlertsByStudent($this->session->get('gibbonSchoolYearID'), $gibbonPersonID);
+        $alerts = [];
+        
+        foreach ($allAlerts as $alert) {
+            if (empty($alerts[$alert['type']])) {
+                $alerts[$alert['type']] = $alert;
+                continue;
+            }
+
+            $existing = $alerts[$alert['type']];
+
+            $isHigherLevel = $alert['alertLevel'] > $existing['alertLevel'];
+            $isHigherContext = $alert['context'] == 'Manual' && $existing['context'] != 'Manual';
+            $isMoreRecent = $alert['timestampCreated'] > $existing['timestampCreated'];
+
+            if ($isHigherLevel || $isHigherContext || $isMoreRecent) {
+                $alerts[$alert['type']] = $alert;
+            }
+        }
+
+        return $alerts;
+    }
 
     // Individual Needs Alert
     protected function calculateIndividualNeedsAlerts($gibbonPersonID)
     {
-        $resultAlert = $this->inPersonDescriptorGateway->selectINPersonDescriptorsandAlertLevelsByPersonID($gibbonPersonID);
+        if (!$this->isAlertTypeActive('Individual Needs')) return;
+
+        $resultAlert = $this->inPersonDescriptorGateway->selectINDescriptorAlertLevelsByPerson($gibbonPersonID);
 
         if ($alert = $resultAlert->fetch()) {
-            $title = $resultAlert->rowCount() == 1 ? $resultAlert->rowCount() . ' ' . sprintf(__('Individual Needs alert is set, with an alert level of %1$s.'), $alert['name']) : $resultAlert->rowCount() . ' ' . sprintf(__('Individual Needs alerts are set, up to a maximum alert level of %1$s.'), $alert['name']);
+            $alertType = $this->getAlertType('Individual Needs');
 
             $this->alerts[] = [
-                'highestLevel'    => __($alert['name']),
-                'color'   => $alert['color'],
-                'colorBG' => $alert['colorBG'],
-                'tag'             => __('IN'),
-                'title'           => $title,
-                'link'            => Url::fromModuleRoute('Students', 'student_view_details')
-                    ->withQueryParams(['gibbonPersonID' => $gibbonPersonID, 'subpage' => 'Individual Needs']),
+                'gibbonAlertTypeID'  => $alertType['gibbonAlertTypeID'],
+                'gibbonAlertLevelID' => $this->getAlertLevelID($alert['level']),
+                'context'            => 'Automatic',
+                'status'             => 'Approved',
+                'type'               => $alertType['name'],
+                'level'              => $alert['level'] ?? null,
             ];
         }
     }
@@ -154,144 +189,160 @@ class Alert
     // Academic Alert
     protected function calculateAcademicAlerts($gibbonPersonID)
     {
-        $resultAlert = $this->markbookEntryGateway->selectCompletedMarkbookByStudent($gibbonPersonID, $this->session->get('gibbonSchoolYearID'));
-        $resultAlertCount = $resultAlert->rowCount();
+        if (!$this->isAlertTypeActive('Academic')) return;
 
-        $thresholds = $this->getAlertThresholds('academic');
-        $alertData = $this->determineAlertLevelAndThresholdText($resultAlertCount, $thresholds);
+        $resultAlert = $this->markbookEntryGateway->selectMarkbookConcernsByStudentAndDate($this->session->get('gibbonSchoolYearID'), $gibbonPersonID, $this->days);
 
-        if (!empty($alertData)) {
-            $gibbonAlertLevelID = $alertData['level'] ?? '';
-            $alertThresholdText = $alertData['text'] ?? '';
-            
-            if ($alert = $this->alertLevelGateway->getByID($gibbonAlertLevelID)) {
-                $this->alerts[] = [
-                    'highestLevel'    => __($alert['name']),
-                    'color'   => $alert['color'],
-                    'colorBG' => $alert['colorBG'],
-                    'tag'             => __('A'),
-                    'title'           => sprintf(__('Student has a %1$s alert for academic concern over the past 60 days.'), __($alert['name'])) . ' ' . $alertThresholdText,
-                    'link'            => Url::fromModuleRoute('Students', 'student_view_details')
-                                            ->withQueryParams([
-                                                'gibbonPersonID' => $gibbonPersonID,
-                                                'subpage' => 'Markbook',
-                                                'filter' => $this->session->get('gibbonSchoolYearID'),
-                                            ]),
-                ];
-            }
+        $alertType = $this->getAlertType('Academic');
+        $alertLevel = $this->getAlertLevelByThreshold($alertType['name'], $resultAlert->rowCount());
+
+        if (!empty($alertLevel)) {
+            $this->alerts[] = [
+                'gibbonAlertTypeID'  => $alertType['gibbonAlertTypeID'],
+                'gibbonAlertLevelID' => $alertLevel['id'] ?? null,
+                'context'            => 'Automatic',
+                'status'             => 'Approved',
+                'type'               => $alertType['name'],
+                'level'              => $alertLevel['level'] ?? null,
+            ];
         }
+        
     }
 
     // Behaviour Alert
     protected function calculateBehaviourAlerts($gibbonPersonID)
     {
-        $resultAlert = $this->behaviourGateway->selectNegativeBehavioursByStudent($gibbonPersonID);
-        $resultAlertCount = $resultAlert->rowCount();
+        if (!$this->isAlertTypeActive('Behaviour')) return;
 
-        $thresholds = $this->getAlertThresholds('behaviour');
-        $alertData = $this->determineAlertLevelAndThresholdText($resultAlertCount, $thresholds);
+        $resultAlert = $this->behaviourGateway->selectNegativeBehaviourByStudentAndDate($gibbonPersonID, $this->days);
 
-        if (!empty($alertData)) {
-            $gibbonAlertLevelID = $alertData['level'] ?? '';
-            $alertThresholdText = $alertData['text'] ?? '';
+        $alertType = $this->getAlertType('Behaviour');
+        $alertLevel = $this->getAlertLevelByThreshold($alertType['name'], $resultAlert->rowCount());
 
-            if ($alert = $this->alertLevelGateway->getByID($gibbonAlertLevelID)) {
-                $this->alerts[] = [
-                    'highestLevel'    => __($alert['name']),
-                    'color'   => $alert['color'],
-                    'colorBG' => $alert['colorBG'],
-                    'tag'             => __('B'),
-                    'title'           => sprintf(__('Student has a %1$s alert for behaviour over the past 60 days.'), __($alert['name'])) . ' ' . $alertThresholdText,
-                    'link'            => Url::fromModuleRoute('Students', 'student_view_details')
-                                            ->withQueryParams(['gibbonPersonID' => $gibbonPersonID, 'subpage' => 'Behaviour']),
-                ];
-            }
+        if (!empty($alertLevel)) {
+            $this->alerts[] = [
+                'gibbonAlertTypeID'  => $alertType['gibbonAlertTypeID'],
+                'gibbonAlertLevelID' => $alertLevel['id'] ?? null,
+                'context'            => 'Automatic',
+                'status'             => 'Approved',
+                'type'               => $alertType['name'],
+                'level'              => $alertLevel['level'] ?? null,
+            ];
         }
     }
 
     // Medical Alert
     protected function calculateMedicalAlerts($gibbonPersonID)
     {
+        if (!$this->isAlertTypeActive('Medical')) return;
+
         if ($alert = $this->medicalGateway->getHighestMedicalRisk($gibbonPersonID)) {
+            $alertType = $this->getAlertType('Medical');
             $this->alerts[] = [
-                'highestLevel'    => __($alert['name']),
-                'color'   => $alert['color'],
-                'colorBG' => $alert['colorBG'],
-                'tag'             => __('M'),
-                'title'           => sprintf(__('Medical alerts are set, up to a maximum of %1$s'), $alert['name']),
-                'link'            => Url::fromModuleRoute('Students', 'student_view_details')
-                    ->withQueryParams(['gibbonPersonID' => $gibbonPersonID, 'subpage' => 'Medical']),
+                'gibbonAlertTypeID'  => $alertType['gibbonAlertTypeID'],
+                'gibbonAlertLevelID' => $this->getAlertLevelID($alert['level']),
+                'context'            => 'Automatic',
+                'status'             => 'Approved',
+                'type'               => $alertType['name'],
+                'level'              => $alert['level'],
             ];
         }
     }
 
     // Privacy Alert
-    protected function calculatePrivacyAlerts($gibbonPersonID, $privacy)
+    protected function calculatePrivacyAlerts($gibbonPersonID)
     {
+        if (!$this->isAlertTypeActive('Privacy')) return;
+
         $privacySetting = $this->settingGateway->getSettingByScope('User Admin', 'privacy');
-
-        if ($privacySetting == 'Y' and $privacy != '') {
-            if ($alert = $this->alertLevelGateway->getByID(AlertLevelGateway::LEVEL_HIGH)) {
-                $this->alerts[] = [
-                    'highestLevel'    => __($alert['name']),
-                    'color'   => $alert['color'],
-                    'colorBG' => $alert['colorBG'],
-                    'tag'             => __('P'),
-                    'title'           => sprintf(__('Privacy is required: %1$s'), $privacy),
-                    'link'            => Url::fromModuleRoute('Students', 'student_view_details')
-                                            ->withQueryParam('gibbonPersonID', $gibbonPersonID),
-                ];
-            }
+        if ($privacySetting != 'Y') return;
+           
+        $person = $this->userGateway->getByID($gibbonPersonID, ['privacy']);
+        if (!empty($person['privacy']) && $alertType = $this->getAlertType('Privacy')) {
+            $this->alerts[] = [
+                'gibbonAlertTypeID'  => $alertType['gibbonAlertTypeID'],
+                'gibbonAlertLevelID' => null,
+                'context'            => 'Automatic',
+                'status'             => 'Approved',
+                'type'               => $alertType['name'],
+                'level'              => null,
+            ];
         }
     }
 
-    // Custom Alert
-    protected function calculateCustomAlerts($gibbonPersonID)
+    private function getAlertTextAndLink($gibbonPersonID, $type, $level = '') : array
     {
-        $customTypes = $this->alertGateway->selectCustomAlertTypes()->fetchAll();
+        $link = Url::fromModuleRoute('Students', 'student_view_details');
 
-        foreach ($customTypes as $type) {
-            if ($alert = $this->alertGateway->getHighestCustomAlert($gibbonPersonID, $this->session->get('gibbonSchoolYearID'), $type['name'])) {
-                $this->alerts[] = [
-                    'highestLevel'    => __($alert['name']),
-                    'color'   => $alert['color'],
-                    'colorBG' => $alert['colorBG'],
-                    'tag'             => $alert['tag'],
-                    'title'           => $alert['description'],
-                    'link'            => Url::fromModuleRoute('Students', 'student_view_details')
-                                            ->withQueryParams(['gibbonPersonID' => $gibbonPersonID]),
+        switch ($type) {
+            case 'Individual Needs':
+                return [
+                    'title' => __('Individual Needs alerts are set, up to a maximum alert level of {level}.', ['level' => $level]),
+                    'link' => $link->withQueryParams(['gibbonPersonID' => $gibbonPersonID, 'subpage' => 'Individual Needs']),
                 ];
-            }
+            case 'Academic':
+                return [
+                    'title' => __('Student has a {level} alert for academic concern over the past 60 days.', ['level' => $level]).' '.$this->getThresholdText($type, $level),
+                    'link' => $link->withQueryParams(['gibbonPersonID' => $gibbonPersonID, 'subpage' => 'Markbook', 'filter' => $this->session->get('gibbonSchoolYearID')]),
+                ];
+            case 'Behaviour':
+                return [
+                    'title' => __('Student has a {level} alert for behaviour over the past 60 days.', ['level' => $level]).' '.$this->getThresholdText($type, $level),
+                    'link' => $link->withQueryParams(['gibbonPersonID' => $gibbonPersonID, 'subpage' => 'Behaviour']),
+                ];
+            case 'Medical':
+                return [
+                    'title' => __('Medical alerts are set, up to a maximum of {level}', ['level' => $level]),
+                    'link' => $link->withQueryParams(['gibbonPersonID' => $gibbonPersonID, 'subpage' => 'Medical']),
+                ];
+            case 'Privacy':
+                return [
+                    'title' => __('Privacy is required: {level}', ['level' => $level]),
+                    'link' => $link->withQueryParams(['gibbonPersonID' => $gibbonPersonID]),
+                ];
+            default:
+                return [
+                    'title' => __($type).': '.__($level),
+                    'link' => $link->withQueryParams(['gibbonPersonID' => $gibbonPersonID]),
+                ];
         }
-        
     }
 
-    private function getAlertThresholds($type)
+    private function getThresholdText($type, $level) : string
     {
-        return [
-            'low' => $this->settingGateway->getSettingByScope('Students', "{$type}AlertLowThreshold"),
-            'medium' => $this->settingGateway->getSettingByScope('Students', "{$type}AlertMediumThreshold"),
-            'high' => $this->settingGateway->getSettingByScope('Students', "{$type}AlertHighThreshold"),
-        ];
+        $alertType = $this->getAlertType($type);
+
+        if (empty($level) || empty($alertType['thresholdHigh'])) return '';
+
+        switch ($level) {
+            case 'High':
+                return __('This alert level occurs when there are more than {count} events recorded for a student.', ['count' => $alertType['thresholdHigh']]);
+            case 'Medium':
+                return __('This alert level occurs when there are between {count} and {count2} events recorded for a student.', ['count' => $alertType['thresholdMed'], 'count2' => $alertType['thresholdHigh'] - 1]);
+            case 'Low':
+                return __('This alert level occurs when there are between {count} and {count2} events recorded for a student.', ['count' => $alertType['thresholdLow'], 'count2' => $alertType['thresholdMed'] - 1]);
+        }
+
+        return '';
     }
 
-    private function determineAlertLevelAndThresholdText($count, $thresholds)
+    private function getAlertLevelID($level)
     {
-        if ($count >= $thresholds['high']) {
-            return [
-                'level' => 001,
-                'text'  => sprintf(__('This alert level occurs when there are more than %1$s events recorded for a student.'), $thresholds['high']),
-            ];
-        } elseif ($count >= $thresholds['medium']) {
-            return [
-                'level' => 002,
-                'text'  => sprintf(__('This alert level occurs when there are between %1$s and %2$s events recorded for a student.'), $thresholds['medium'], $thresholds['high'] - 1),
-            ];
-        } elseif ($count >= $thresholds['low']) {
-            return [
-                'level' => 003,
-                'text'  => sprintf(__('This alert level occurs when there are between %1$s and %2$s events recorded for a student.'), $thresholds['low'], $thresholds['medium'] - 1),
-            ];
+        return $this->alertLevels[$level] ?? null;
+    }
+
+    private function getAlertLevelByThreshold($type, $count)
+    {
+        $alertType = $this->getAlertType($type);
+
+        if (empty($alertType['thresholdHigh']) || empty($alertType['thresholdMed']) || empty($alertType['thresholdLow'])) return null;
+
+        if ($count >= $alertType['thresholdHigh']) {
+            return ['id' => 001, 'level' => 'High'];
+        } elseif ($count >= $alertType['thresholdMed']) {
+            return ['id' => 002, 'level' => 'Medium'];
+        } elseif ($count >= $alertType['thresholdLow']) {
+            return ['id' => 003, 'level' => 'Low'];
         }
 
         return null;

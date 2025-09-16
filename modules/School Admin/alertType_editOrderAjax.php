@@ -20,29 +20,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Domain\StudentAlerts\AlertTypeGateway;
-use Gibbon\Forms\Prefab\DeleteForm;
 
-if (!isActionAccessible($guid, $connection2, '/modules/School Admin/alertLevelSettings.php')) {
-    // Access denied
-    $page->addError(__('You do not have access to this action.'));
+require_once '../../gibbon.php';
+
+if (isActionAccessible($guid, $connection2, '/modules/School Admin/alertLevelSettings.php') == false) {
+    exit;
 } else {
     // Proceed!
-    $gibbonAlertTypeID = $_GET['gibbonAlertTypeID'] ?? '';
-
-    if (empty($gibbonAlertTypeID)) {
-        $page->addError(__('You have not specified one or more required parameters.'));
-        return;
-    }
-
-    $values = $container->get(AlertTypeGateway::class)->getByID($gibbonAlertTypeID);
-
-    if (empty($values)) {
-        $page->addError(__('The specified record cannot be found.'));
-        return;
-    }
-
-    $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/School Admin/alertType_deleteProcess.php', true);
-    $form->addHiddenValue('gibbonAlertTypeID', $gibbonAlertTypeID);
-
-    echo $form->getOutput();
+    $alertTypeGateway = $container->get(AlertTypeGateway::class)->updateSequenceNumbers($_POST['order'] ?? []);
 }

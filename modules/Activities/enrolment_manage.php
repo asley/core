@@ -22,11 +22,13 @@ use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Forms\MultiPartForm;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Domain\Students\MedicalGateway;
 use Gibbon\Domain\Activities\ActivityGateway;
 use Gibbon\Module\Activities\EnrolmentGenerator;
 use Gibbon\Domain\Activities\ActivityChoiceGateway;
 use Gibbon\Domain\Activities\ActivityStudentGateway;
 use Gibbon\Domain\Activities\ActivityCategoryGateway;
+use Gibbon\Domain\IndividualNeeds\INPersonDescriptorGateway;
 
 
 
@@ -83,10 +85,30 @@ if (isActionAccessible($guid, $connection2, '/modules/Activities/enrolment_manag
     $unenrolled = $activityStudentGateway->queryUnenrolledStudentsByCategory($criteria, $params['gibbonActivityCategoryID'])->toArray();
 
     $enrolments = array_merge($enrolments, $unenrolled);
-    
+  
+    $totalEnrolments = [];
+
+    foreach ($enrolments as $alertPerson) {
+        $gibbonPersonID = $alertPerson['gibbonPersonID'] ?? '';
+        
+        $medicalAlert = $container->get(MedicalGateway::class)->getHighestMedicalRisk($gibbonPersonID);
+        if ($medicalAlert) {
+            $medicalAlertDescription = sprintf(__('Medical alerts are set, up to a maximum of %1$s'), $medicalAlert['name']);
+            $alertPerson['medicalAlertDescription'] = $medicalAlertDescription;
+        }
+
+        $INAlert = $container->get(INPersonDescriptorGateway::class)->selectINPersonDescriptorsandAlertLevelsByPersonID($gibbonPersonID);
+        if ($highestINAlert = $INAlert->fetch()) {
+                $INAlertDescription = $INAlert->rowCount() == 1 ? $INAlert->rowCount() . ' ' . sprintf(__('Individual Needs alert is set, with an alert level of %1$s.'), $highestINAlert['name']) : $INAlert->rowCount() . ' ' . sprintf(__('Individual Needs alerts are set, up to a maximum alert level of %1$s.'), $highestINAlert['name']);
+                $alertPerson['INAlertDescription'] = $INAlertDescription;
+        }
+
+        $totalEnrolments[] = $alertPerson;
+    }
+
     $groups = [];
 
-    foreach ($enrolments as $person) {
+    foreach ($totalEnrolments as $person) {
         for ($i = 1; $i <= $signUpChoices; $i++) {
             if (empty($person["choice{$i}"])) continue;
             $person["choice{$i}"] = str_pad($person["choice{$i}"], 8, '0', STR_PAD_LEFT);

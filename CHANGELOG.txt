@@ -36,6 +36,7 @@ v30.0.00
         Activities: added the option for parents to register their children in activities
         Activities: added student tags on the Manage Enrolment page
         Activities: added a description field to the cost section for activities
+        Activities: included the photos in the new copy when an activity is duplicated
         Behaviour: added Add Multiple button to Behaviour tab of student profile
         Individual Needs: enabled viewing IN records for past students as read-only
         Library: added the option to send an email to parents when lending a library item

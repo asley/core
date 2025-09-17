@@ -29,6 +29,9 @@ use Gibbon\Domain\Activities\ActivityChoiceGateway;
 use Gibbon\Domain\Activities\ActivityStudentGateway;
 use Gibbon\Domain\Activities\ActivityCategoryGateway;
 use Gibbon\Domain\IndividualNeeds\INPersonDescriptorGateway;
+use Gibbon\View\Component;
+use Gibbon\UI\Components\Alert;
+use Gibbon\Domain\StudentAlerts\AlertGateway;
 
 
 
@@ -46,6 +49,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Activities/enrolment_manag
     $categoryGateway = $container->get(ActivityCategoryGateway::class);
     $activityGateway = $container->get(ActivityGateway::class);
     $activityStudentGateway = $container->get(ActivityStudentGateway::class);
+    $alertGateway = $container->get(AlertGateway::class);
 
     $categories = $categoryGateway->selectCategoriesBySchoolYear($session->get('gibbonSchoolYearID'))->fetchKeyPair();
     
@@ -85,30 +89,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Activities/enrolment_manag
     $unenrolled = $activityStudentGateway->queryUnenrolledStudentsByCategory($criteria, $params['gibbonActivityCategoryID'])->toArray();
 
     $enrolments = array_merge($enrolments, $unenrolled);
-  
-    $totalEnrolments = [];
+    $alert = $container->get(Alert::class);
 
-    foreach ($enrolments as $alertPerson) {
-        $gibbonPersonID = $alertPerson['gibbonPersonID'] ?? '';
-        
-        $medicalAlert = $container->get(MedicalGateway::class)->getHighestMedicalRisk($gibbonPersonID);
-        if ($medicalAlert) {
-            $medicalAlertDescription = sprintf(__('Medical alerts are set, up to a maximum of %1$s'), $medicalAlert['name']);
-            $alertPerson['medicalAlertDescription'] = $medicalAlertDescription;
-        }
+    foreach ($enrolments as $index => $person) {
+        $gibbonPersonID = $person['gibbonPersonID'] ?? '';
+        $person['age'] = !empty($person['dob']) ? Format::age($person['dob']) : '';
+        $person['link'] = Url::fromModuleRoute('Students', 'student_view_details')->withQueryParams(['gibbonPersonID' => $person['gibbonPersonID']]);
+        $person['alerts'] = $alert->getAlertBar($gibbonPersonID, '', false);
 
-        $INAlert = $container->get(INPersonDescriptorGateway::class)->selectINPersonDescriptorsandAlertLevelsByPersonID($gibbonPersonID);
-        if ($highestINAlert = $INAlert->fetch()) {
-                $INAlertDescription = $INAlert->rowCount() == 1 ? $INAlert->rowCount() . ' ' . sprintf(__('Individual Needs alert is set, with an alert level of %1$s.'), $highestINAlert['name']) : $INAlert->rowCount() . ' ' . sprintf(__('Individual Needs alerts are set, up to a maximum alert level of %1$s.'), $highestINAlert['name']);
-                $alertPerson['INAlertDescription'] = $INAlertDescription;
-        }
-
-        $totalEnrolments[] = $alertPerson;
+        $enrolments[$index] = $person;
     }
 
     $groups = [];
 
-    foreach ($totalEnrolments as $person) {
+    foreach ($enrolments as $person) {
         for ($i = 1; $i <= $signUpChoices; $i++) {
             if (empty($person["choice{$i}"])) continue;
             $person["choice{$i}"] = str_pad($person["choice{$i}"], 8, '0', STR_PAD_LEFT);

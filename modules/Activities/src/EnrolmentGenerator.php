@@ -274,7 +274,7 @@ class EnrolmentGenerator
     {
         $person['age'] = !empty($person['dob']) ? Format::age($person['dob']) : '';
         $person['link'] = Url::fromModuleRoute('Students', 'student_view_details')->withQueryParams(['gibbonPersonID' => $person['gibbonPersonID']]);
-        $person['alerts'] = $this->alert->getAlertBar($person['gibbonPersonID'], '', false);
+        $person['alerts'] = $this->alert->getAlertBar($person['gibbonPersonID'], ['wrap' => false, 'filter' => ['Medical', 'Individual Needs', 'Privacy']]);
 
         return $person;
     }

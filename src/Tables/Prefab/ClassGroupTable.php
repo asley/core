@@ -92,7 +92,7 @@ class ClassGroupTable extends DataTable
             $alert = $container->get(Alert::class);
             $this->addColumn('alerts')
                 ->format(function ($person) use ($alert) {
-                    return $alert->getAlertBar($person['gibbonPersonID'], "x-cloak x-transition.opacity x-show='globalShowHide'");
+                    return $alert->getAlertBar($person['gibbonPersonID'], ['attributes' => "x-cloak x-transition.opacity x-show='globalShowHide'"]);
                 });
         }
 

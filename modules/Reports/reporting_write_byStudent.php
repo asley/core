@@ -126,7 +126,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Reports/reporting_write_by
     $scopeDetails = $reportingAccessGateway->selectReportingDetailsByScope($urlParams['gibbonReportingScopeID'], $reportingScope['scopeType'], $urlParams['scopeTypeID'])->fetch();
     $relatedReports = $container->get(ReportingScopeGateway::class)->selectRelatedReportingScopesByID($urlParams['gibbonReportingScopeID'], $reportingScope['scopeType'], $urlParams['scopeTypeID'])->fetchAll();
     $reportingProgress = $container->get(ReportingProgressGateway::class)->selectBy(['gibbonReportingScopeID' => $urlParams['gibbonReportingScopeID'], $scopeIdentifier => $urlParams['scopeTypeID'], 'gibbonPersonIDStudent' => $gibbonPersonIDStudent])->fetch();
-    $student['alerts'] = $container->get(Alert::class)->getAlertBar($gibbonPersonIDStudent, '', false, false, "_blank");
+    $student['alerts'] = $container->get(Alert::class)->getAlertBar($gibbonPersonIDStudent, ['wrap' => false, 'target' => '_blank']);
     
     $progress = $reportingAccessGateway->selectReportingProgressByScope($urlParams['gibbonReportingScopeID'], $reportingScope['scopeType'], $urlParams['scopeTypeID'], $urlParams['allStudents'] == 'Y')->fetchGroupedUnique();
     $progressComplete = array_reduce($progress, function ($group, $item) {

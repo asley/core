@@ -95,7 +95,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Activities/enrolment_manag
         $gibbonPersonID = $person['gibbonPersonID'] ?? '';
         $person['age'] = !empty($person['dob']) ? Format::age($person['dob']) : '';
         $person['link'] = Url::fromModuleRoute('Students', 'student_view_details')->withQueryParams(['gibbonPersonID' => $person['gibbonPersonID']]);
-        $person['alerts'] = $alert->getAlertBar($gibbonPersonID, '', false);
+        $person['alerts'] = $alert->getAlertBar($gibbonPersonID, ['wrap' => false, 'filter' => ['Medical', 'Individual Needs', 'Privacy']]);
 
         $enrolments[$index] = $person;
     }

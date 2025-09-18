@@ -2471,7 +2471,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Students/student_view_deta
                     $alert = '';
                     //Show alerts
                     if ($highestAction == 'View Student Profile_fullEditAllNotes' || $highestAction == 'View Student Profile_full' || $highestAction == 'View Student Profile_fullNoNotes') {
-                        $alert = $container->get(Alert::class)->getAlertBar($gibbonPersonID, '', false, true);
+                        $alert = $container->get(Alert::class)->getAlertBar($gibbonPersonID, ['wrap' => false, 'large' => true]);
                         $sidebarExtra .= '<div class="w-48 sm:w-64 h-10 mb-2">'.$alert.'</div>';
                     }
                     

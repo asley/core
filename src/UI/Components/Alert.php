@@ -99,8 +99,16 @@ class Alert
      * @param string $target
      * @return void
      */
-    public function getAlertBar(string $gibbonPersonID, $divExtras = '', $div = true, $large = false, $target = '_self') 
+    public function getAlertBar(string $gibbonPersonID, array $params) 
     {
+        $params = $params + [
+            'attributes' => '',
+            'wrap'       => true,
+            'large'      => false,
+            'target'     => '_self',
+            'filter'     => [],
+        ];
+
         $action = Access::get('Students', 'student_view_details');
         if (!$action->allowsAny('View Student Profile_full', 'View Student Profile_fullNoNotes', 'View Student Profile_fullEditAllNotes')) return '';
 
@@ -108,18 +116,21 @@ class Alert
         $alerts = $this->getAlertsByStudent($gibbonPersonID);
         
         foreach ($alerts as $alert) {
+            // Enable filtering only specific types of alerts (eg: activities management pages)
+            if (!empty($params['filter']) && !in_array($alert['type'], $params['filter'])) continue;
+            
             $details = $this->getAlertTextAndLink($gibbonPersonID, $alert['type'], $alert['level'] ?? $alert['privacy']);
 
             $output .= Component::render(Alert::class, [
                 'color'   => $alert['levelColor'] ?? $alert['color'] ?? '#939090',
                 'colorBG' => $alert['levelColorBG'] ?? $alert['colorBG'] ?? '#dddddd',
-                'large'   => $large,
-                'target'  => $target == '_blank' ? '_blank' : '_self',
+                'large'   => $params['large'],
+                'target'  => $params['target'] == '_blank' ? '_blank' : '_self',
             ] + $details + $alert);
         }
 
-        if ($div == true) {
-            $output = "<div class='w-20 lg:w-24 h-6 -mt-6 text-left py-1 px-0 mx-auto'><div {$divExtras}>{$output}</div></div>";
+        if ($params['wrap'] == true) {
+            $output = "<div class='w-20 lg:w-24 h-6 -mt-6 text-left py-1 px-0 mx-auto'><div ".$params['attributes'].">{$output}</div></div>";
         }
         
         return $output;

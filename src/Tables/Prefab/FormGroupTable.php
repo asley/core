@@ -97,7 +97,7 @@ class FormGroupTable extends DataTable
 
             $this->addColumn('alerts')
                 ->format(function ($person) use ($gibbonFormGroupID, $container) {
-                    return $container->get(Alert::class)->getAlertBar($person['gibbonPersonID'], "x-transition.opacity x-show='globalShowHide'");
+                    return $container->get(Alert::class)->getAlertBar($person['gibbonPersonID'], ['attributes' => "x-transition.opacity x-show='globalShowHide'"]);
                 });
         }
 

@@ -30,6 +30,7 @@ use Gibbon\Forms\FormFactoryInterface;
 use League\Container\ContainerAwareTrait;
 use Gibbon\Forms\View\FormRendererInterface;
 use Gibbon\Forms\Traits\BasicAttributesTrait;
+use Gibbon\Forms\Layout\Row;
 
 /**
  * Form
@@ -80,9 +81,9 @@ class Form implements OutputableInterface
      * @param    string  $action
      * @param    string  $method
      * @param    string  $class
-     * @return   object  Form object
+     * @return  Form
      */
-    public static function create($id, $action, $method = 'post', $class = 'standardForm')
+    public static function create($id, $action, $method = 'post', $class = 'standardForm') : Form
     {
         global $container;
 
@@ -106,7 +107,10 @@ class Form implements OutputableInterface
         return $form;
     }
 
-    public static function createSearch($id = 'search', $action = '', $method = 'get', $class = '')
+    /**
+     * @return Form
+     */
+    public static function createSearch($id = 'search', $action = '', $method = 'get', $class = '') : Form
     {
         $form = static::create($id, $action ?? Url::fromRoute(), $method, $class);
         $form->renderer->setTemplate('components/formSearch.twig.html');
@@ -123,7 +127,10 @@ class Form implements OutputableInterface
         return $form;
     }
 
-    public static function createTable($id, $action, $method = 'post', $class = 'smallIntBorder w-full')
+    /**
+     * @return Form
+     */
+    public static function createTable($id, $action, $method = 'post', $class = 'smallIntBorder w-full') : Form
     {
         $form = static::create($id, $action, $method, $class);
         $form->renderer->setTemplate('components/formTable.twig.html');
@@ -131,7 +138,10 @@ class Form implements OutputableInterface
         return $form;
     }
 
-    public static function createBlank($id, $action = '', $method = 'post', $class = '')
+    /**
+     * @return Form
+     */
+    public static function createBlank($id, $action = '', $method = 'post', $class = '') : Form
     {
         $form = static::create($id, $action, $method, $class);
         $form->renderer->setTemplate('components/formBlank.twig.html');
@@ -278,9 +288,9 @@ class Form implements OutputableInterface
     /**
      * Adds a Row object to the form and returns it.
      * @param  string  $id
-     * @return object Row
+     * @return Row
      */
-    public function addRow($id = '')
+    public function addRow($id = '') : Row
     {
         $section = !empty($this->rows) ? end($this->rows)->getHeading() : '';
         $row = $this->factory->createRow($id)->setHeading($section);
@@ -292,9 +302,9 @@ class Form implements OutputableInterface
 
     /**
      * Cet the last added Row object, null if none exist.
-     * @return  object|null
+     * @return  Row|null
      */
-    public function getRow()
+    public function getRow() : Row
     {
         return (!empty($this->rows))? end($this->rows) : null;
     }
@@ -303,7 +313,7 @@ class Form implements OutputableInterface
      * Get an array of all Row objects in the form.
      * @return  array
      */
-    public function getRows()
+    public function getRows() : array
     {
         return array_filter($this->rows, function ($item) {
             return !empty($item->getElements());
@@ -314,7 +324,7 @@ class Form implements OutputableInterface
      * Get the total number of rows in a form.
      * @return  array
      */
-    public function getRowCount()
+    public function getRowCount() : int
     {
         return count($this->rows);
     }

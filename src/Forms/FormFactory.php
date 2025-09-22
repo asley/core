@@ -149,7 +149,7 @@ class FormFactory implements FormFactoryInterface
 
     /* BASIC INPUT --------------------------- */
 
-    public function createCustomField($name, $fields = array())
+    public function createCustomField($name, $fields = [])
     {
         return new Input\CustomField($this, $name, $fields);
     }
@@ -315,7 +315,7 @@ class FormFactory implements FormFactoryInterface
         return $this->createButton(__($label), null, $id)->setType('submit')->addClass('text-right');
     }
 
-    public function createSearchSubmit($session, $clearLabel = 'Clear Filters', $passParams = array())
+    public function createSearchSubmit($session, $clearLabel = 'Clear Filters', $passParams = [])
     {
         $passParams[] = 'q';
         $parameters = array_intersect_key($_GET, array_flip($passParams));

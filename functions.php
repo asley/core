@@ -666,8 +666,6 @@ function getModuleName($address)
         $nextSlash = stripos($dir, '/');
         return $nextSlash !== false ? substr($dir, 0, $nextSlash) : $dir;
     }
-    //$dir = substr($address, $pos+8);
-    //return $pos !== false ? substr($dir, 0, stripos($dir, '/')) : '';
 
     $pos = stripos($address, 'module');
     if ($pos !== false) {

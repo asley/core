@@ -169,6 +169,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Planner/planner_view_full.
                     echo '</div>';
                 } else {
                     $values = $result->fetch();
+
                     $gibbonDepartmentID = null;
                     if (isset($values['gibbonDepartmentID'])) {
                         $gibbonDepartmentID = $values['gibbonDepartmentID'];
@@ -318,6 +319,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Planner/planner_view_full.
                         $container->get(CustomFieldHandler::class)->addCustomFieldsToTable($table, 'Lesson Plan', [], $values['fields'] ?? '');
 
                         echo $table->render([$values]);
+
+                        $fields = !empty($values['fields'])? json_decode($values['fields'], true) : [];
+                        if (!empty($fields['videoLink']) && ($values['role'] == 'Student' || $values['role'] == 'Teacher')) {
+                            echo '<div class="message tag text-base font-normal flex justify-start items-center gap-4">';
+                            echo icon('outline', 'video', 'inline-block size-8 text-blue-600');
+                            echo Format::bold(__('Online Lesson').':').' '.__('Click the link to join the video call: {link}', ['link' => Format::link($fields['videoLink'],$fields['videoLink'])]);
+                            echo '</div>';
+                        }
 
                         //Lesson outcomes
                         $dataOutcomes = array('gibbonPlannerEntryID' => $values['gibbonPlannerEntryID']);

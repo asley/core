@@ -321,7 +321,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Planner/planner_view_full.
                         echo $table->render([$values]);
 
                         $fields = !empty($values['fields'])? json_decode($values['fields'], true) : [];
-                        if (!empty($fields['videoLink']) && ($values['role'] == 'Student' || $values['role'] == 'Teacher')) {
+                        if (!empty($fields['videoLink']) && ($values['role'] == 'Student' || $values['role'] == 'Teacher' || $roleCategory == 'Staff')) {
                             echo '<div class="message tag text-base font-normal flex justify-start items-center gap-4">';
                             echo icon('outline', 'video', 'inline-block size-8 text-blue-600');
                             echo Format::bold(__('Online Lesson').':').' '.__('Click the link to join the video call: {link}', ['link' => Format::link($fields['videoLink'],$fields['videoLink'])]);

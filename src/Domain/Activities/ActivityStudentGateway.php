@@ -137,7 +137,8 @@ class ActivityStudentGateway extends QueryableGateway
     public function selectEnrolmentsByCategory($gibbonActivityCategoryID)
     {
         $data = ['gibbonActivityCategoryID' => $gibbonActivityCategoryID, 'today' => date('Y-m-d')];
-        $sql = "SELECT gibbonActivityStudent.gibbonPersonID as groupBy,
+        $sql = "SELECT gibbonActivityStudent.gibbonActivityStudentID as groupBy,
+                    gibbonActivityStudent.gibbonActivityStudentID as enrolmentID,
                     gibbonActivityStudent.gibbonActivityID,
                     gibbonActivityStudent.gibbonPersonID,
                     gibbonActivityStudent.status,

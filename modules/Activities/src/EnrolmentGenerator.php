@@ -180,7 +180,9 @@ class EnrolmentGenerator
     {
         $results = ['total' => 0, 'choice0' => 0, 'choice1' => 0, 'choice2' => 0, 'choice3' => 0, 'choice4' => 0, 'choice5' => 0, 'unassigned' => 0, 'inserted' => 0, 'updated' => 0, 'error' => 0];
 
-        foreach ($enrolmentList as $gibbonPersonID => $gibbonActivityID) {
+        foreach ($enrolmentList as $person => $gibbonActivityID) {
+            list($gibbonPersonID, $enrolmentID) = array_pad(explode('-', $person, 2), 2, '');
+
             if (empty($gibbonActivityID)) {
                 $results['unassigned']++;
                 continue;

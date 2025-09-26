@@ -104,7 +104,7 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
     data-choice5="{{ person.choice5 }}" data-preferredName="{{ person.preferredName }}"
     data-surname="{{ person.surname }}" data-formGroup="{{ person.formGroup }}">
 
-    <input type="hidden" name="person[{{ person.gibbonPersonID }}]" value="{{ person.gibbonActivityID ?? 0 }}">
+    <input type="hidden" name="person[{{ person.gibbonPersonID }}-{{ person.enrolmentID }}]" value="{{ person.gibbonActivityID ?? 0 }}">
 
     <div title="{{ __('Age') }}: {{ person.age }}"><a href="{{ person.link }}" class="no-underline hover:underline text-gray-700">{{ person.preferredName }} {{ person.surname }}</a> {{ person.formGroup ? " ("~person.formGroup~")" }}</div>
 
@@ -133,7 +133,7 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
     style="max-width: 18rem;" data-person="{{ person.gibbonPersonID }}" data-preferredName="{{ person.preferredName }}"
     data-surname="{{ person.surname }}">
 
-    <input type="hidden" name="person[{{ person.gibbonPersonID }}][{{ person.gibbonActivityID ?? 0 }}]" value="{{ person.gibbonActivityID ?? 0 }}">
+    <input type="hidden" name="person[{{ person.gibbonPersonID }}-{{ person.enrolmentID }}][{{ person.gibbonActivityID ?? 0 }}]" value="{{ person.gibbonActivityID ?? 0 }}">
 
     <div>{{ person.preferredName }} {{ person.surname }}</div>
 
@@ -141,7 +141,7 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
 
     <span class="personType ml-2 text-xxs tag {{ person.type == 'Teaching' ? 'message' : 'bg-purple-200 text-purple-700'}} hidden">{{ person.type }}</span>
 
-    <select name="role[{{ person.gibbonPersonID }}][{{ person.gibbonActivityID ?? 0 }}]" class="ml-2 text-xxs py-1 px-2 h-6 message border-0 hidden">
+    <select name="role[{{ person.gibbonPersonID }}-{{ person.enrolmentID }}][{{ person.gibbonActivityID ?? 0 }}]" class="ml-2 text-xxs py-1 px-2 h-6 message border-0 hidden">
         <option value="Organiser" {{ person.role == 'Organiser' ? 'selected' }}>{{ __('Organiser') }}</option>
         <option value="Coach" {{ role == 'Coach' ? 'selected' }}>{{ __('Coach') }}</option>
         <option value="Assistant" {{ role == 'Assistant' ? 'selected' }}>{{ __('Assistant') }}</option>

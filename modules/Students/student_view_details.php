@@ -1229,102 +1229,104 @@ if (isActionAccessible($guid, $connection2, '/modules/Students/student_view_deta
                         echo $table->render(new DataSet(array_merge($familyAdults, $contacts, $staff)));
 
                     } elseif ($subpage == 'Medical') {
-                        /** @var MedicalGateway */
-                        $medicalGateway = $container->get(MedicalGateway::class);
+                        if (!$skipBrief) {
+                            echo Format::alert(__('Your request failed because you do not have access to this action.'));
+                        } else {
+                            /** @var MedicalGateway */
+                            $medicalGateway = $container->get(MedicalGateway::class);
 
-                        $medical = $medicalGateway->getMedicalFormByPerson($gibbonPersonID);
-                        $conditions = $medicalGateway->selectMedicalConditionsByID($medical['gibbonPersonMedicalID'] ?? null)->fetchAll();
+                            $medical = $medicalGateway->getMedicalFormByPerson($gibbonPersonID);
+                            $conditions = $medicalGateway->selectMedicalConditionsByID($medical['gibbonPersonMedicalID'] ?? null)->fetchAll();
 
-                        //Medical alert!
-                        $alert = $medicalGateway->getHighestMedicalRisk($gibbonPersonID);
-                        if (!empty($alert)) {
-                            echo "<div class='error' style='background-color: #".$alert['colorBG'].'; border: 1px solid #'.$alert['color'].'; color: #'.$alert['color']."'>";
-                            echo '<b>'.__('This student has one or more {level} risk medical conditions.', ['level' => __($alert['name'])]).'</b>';
-                            echo '</div>';
-                        }
-
-                        // MEDICAL DETAILS
-                        $table = DataTable::createDetails('medical');
-
-                        if (isActionAccessible($guid, $connection2, '/modules/Students/medicalForm_manage.php')) {
-                            if (empty($medical)) {
-                                $table->addHeaderAction('add', __('Add Medical Form'))
-                                    ->setURL('/modules/Students/medicalForm_manage_add.php')
-                                    ->addParam('gibbonPersonID', $gibbonPersonID)
-                                    ->addParam('search', $search)
-                                    ->displayLabel();
-                            } else {
-                                $table->addHeaderAction('edit', __('Edit Medical Form'))
-                                    ->setURL('/modules/Students/medicalForm_manage_edit.php')
-                                    ->addParam('gibbonPersonID', $gibbonPersonID)
-                                    ->addParam('gibbonPersonMedicalID', $medical['gibbonPersonMedicalID'])
-                                    ->addParam('search', $search)
-                                    ->displayLabel();
-                            }
-                        }
-
-                        $col = $table->addColumn('General Information');
-
-                        $col->addColumn('longTermMedication', __('Long Term Medication'))
-                            ->format(Format::using('yesno', 'longTermMedication'));
-
-                        $col->addColumn('longTermMedicationDetails', __('Details'))
-                            ->addClass('col-span-2')
-                            ->format(function ($medical) {
-                                return !empty($medical['longTermMedication'])
-                                    ? $medical['longTermMedicationDetails']
-                                    : Format::small(__('Unknown'));
-                            });
-
-                        $container->get(CustomFieldHandler::class)->addCustomFieldsToTable($table, 'Medical Form', [], $medical['fields'] ?? '', $table);
-
-                        $col->addColumn('medicalConditions', __('Medical Conditions?'))
-                            ->addClass('col-span-3')
-                            ->format(function ($medical) use ($conditions) {
-                                return count($conditions) > 0
-                                    ? __('Yes').'. '.__('Details below.')
-                                    : __('No');
-                            });
-
-                        if (!empty($medical['comment'])) {
-                            $col->addColumn('comment', __('Comment'))->addClass('col-span-3');
-                        }
-
-
-                        if (!empty($medical['fields']) && is_string($medical['fields'])) {
-                            $fields = json_decode($medical['fields'], true);
-                            $medical = is_array($fields) ? array_merge($medical, $fields) : $medical;
-                        }
-
-                        echo $table->render([$medical]);
-
-                        // MEDICAL CONDITIONS
-                        $canManageMedical = isActionAccessible($guid, $connection2, '/modules/Students/medicalForm_manage.php');
-
-                        foreach ($conditions as $condition) {
-                            $table = DataTable::createDetails('medicalConditions');
-                            $table->setTitle(__($condition['name'])." <span style='color: ".$condition['alertColor']."'>(".__($condition['risk']).' '.__('Risk').')</span>');
-                            $table->setDescription($condition['description']);
-                            $table->addMetaData('gridClass', 'grid-cols-1 md:grid-cols-2');
-
-                            $table->addColumn('triggers', __('Triggers'));
-                            $table->addColumn('reaction', __('Reaction'));
-                            $table->addColumn('response', __('Response'));
-                            $table->addColumn('medication', __('Medication'));
-                            $table->addColumn('lastEpisode', __('Last Episode Date'))
-                                ->format(Format::using('date', 'lastEpisode'));
-                            $table->addColumn('lastEpisodeTreatment', __('Last Episode Treatment'));
-                            $table->addColumn('comment', __('Comments'))->addClass('col-span-2');
-
-                            if ($canManageMedical && !empty($condition['attachment'])) {
-                                $table->addColumn('attachment', __('Attachment'))
-                                    ->addClass('col-span-2')
-                                    ->format(function ($condition) {
-                                        return Format::link('./'.$condition['attachment'], __('View Attachment'), ['target' => '_blank']);
-                                    });
+                            //Medical alert!
+                            $alert = $medicalGateway->getHighestMedicalRisk($gibbonPersonID);
+                            if (!empty($alert)) {
+                                echo "<div class='error' style='background-color: #".$alert['colorBG'].'; border: 1px solid #'.$alert['color'].'; color: #'.$alert['color']."'>";
+                                echo '<b>'.__('This student has one or more {level} risk medical conditions.', ['level' => __($alert['name'])]).'</b>';
+                                echo '</div>';
                             }
 
-                            echo $table->render([$condition]);
+                            // MEDICAL DETAILS
+                            $table = DataTable::createDetails('medical');
+
+                            if (isActionAccessible($guid, $connection2, '/modules/Students/medicalForm_manage.php')) {
+                                if (empty($medical)) {
+                                    $table->addHeaderAction('add', __('Add Medical Form'))
+                                        ->setURL('/modules/Students/medicalForm_manage_add.php')
+                                        ->addParam('gibbonPersonID', $gibbonPersonID)
+                                        ->addParam('search', $search)
+                                        ->displayLabel();
+                                } else {
+                                    $table->addHeaderAction('edit', __('Edit Medical Form'))
+                                        ->setURL('/modules/Students/medicalForm_manage_edit.php')
+                                        ->addParam('gibbonPersonID', $gibbonPersonID)
+                                        ->addParam('gibbonPersonMedicalID', $medical['gibbonPersonMedicalID'])
+                                        ->addParam('search', $search)
+                                        ->displayLabel();
+                                }
+                            }
+
+                            $col = $table->addColumn('General Information');
+
+                            $col->addColumn('longTermMedication', __('Long Term Medication'))
+                                ->format(Format::using('yesno', 'longTermMedication'));
+
+                            $col->addColumn('longTermMedicationDetails', __('Details'))
+                                ->addClass('col-span-2')
+                                ->format(function ($medical) {
+                                    return !empty($medical['longTermMedication'])
+                                        ? $medical['longTermMedicationDetails']
+                                        : Format::small(__('Unknown'));
+                                });
+
+                            $container->get(CustomFieldHandler::class)->addCustomFieldsToTable($table, 'Medical Form', [], $medical['fields'] ?? '', $table);
+
+                            $col->addColumn('medicalConditions', __('Medical Conditions?'))
+                                ->addClass('col-span-3')
+                                ->format(function ($medical) use ($conditions) {
+                                    return count($conditions) > 0
+                                        ? __('Yes').'. '.__('Details below.')
+                                        : __('No');
+                                });
+
+                            if (!empty($medical['comment'])) {
+                                $col->addColumn('comment', __('Comment'))->addClass('col-span-3');
+                            }
+
+
+                            if (!empty($medical['fields']) && is_string($medical['fields'])) {
+                                $fields = json_decode($medical['fields'], true);
+                                $medical = is_array($fields) ? array_merge($medical, $fields) : $medical;
+                            }
+
+                            echo $table->render([$medical]);
+
+                            // MEDICAL CONDITIONS
+                            foreach ($conditions as $condition) {
+                                $table = DataTable::createDetails('medicalConditions');
+                                $table->setTitle(__($condition['name'])." <span style='color: ".$condition['alertColor']."'>(".__($condition['risk']).' '.__('Risk').')</span>');
+                                $table->setDescription($condition['description']);
+                                $table->addMetaData('gridClass', 'grid-cols-1 md:grid-cols-2');
+
+                                $table->addColumn('triggers', __('Triggers'));
+                                $table->addColumn('reaction', __('Reaction'));
+                                $table->addColumn('response', __('Response'));
+                                $table->addColumn('medication', __('Medication'));
+                                $table->addColumn('lastEpisode', __('Last Episode Date'))
+                                    ->format(Format::using('date', 'lastEpisode'));
+                                $table->addColumn('lastEpisodeTreatment', __('Last Episode Treatment'));
+                                $table->addColumn('comment', __('Comments'))->addClass('col-span-2');
+
+                                if (!empty($condition['attachment'])) {
+                                    $table->addColumn('attachment', __('Attachment'))
+                                        ->addClass('col-span-2')
+                                        ->format(function ($condition) {
+                                            return Format::link('./'.$condition['attachment'], __('View Attachment'), ['target' => '_blank']);
+                                        });
+                                }
+
+                                echo $table->render([$condition]);
+                            }
                         }
                     } elseif ($subpage == 'First Aid') {
                         if (isActionAccessible($guid, $connection2, '/modules/Students/firstAidRecord.php') == false) {

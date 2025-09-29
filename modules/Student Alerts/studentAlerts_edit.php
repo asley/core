@@ -22,14 +22,15 @@ use Gibbon\Services\Format;
 use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Domain\StudentAlerts\AlertGateway;
 use Gibbon\Domain\StudentAlerts\AlertTypeGateway;
+use Gibbon\Support\Facades\Access;
 
 if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/studentAlerts_edit.php')) {
 	// Access denied
 	$page->addError(__('You do not have access to this action.'));
 } else {
     // Proceed!
-    $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if (empty($highestAction)) {
+    $action = Access::get('Student Alerts', 'studentAlerts_manage');
+    if (empty($action)) {
         $page->addError(__('The highest grouped action cannot be determined.'));
         return;
     }
@@ -60,7 +61,7 @@ if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/studentAle
 
     $canEditAlert = $alertGateway->getAlertEditAccess($gibbonAlertID, $session->get('gibbonPersonID'));
     
-    if ($highestAction != 'Manage Student Alerts_all' && !$canEditAlert) {
+    if (!$action->allowsAny('Manage Student Alerts_all', 'Manage Student Alerts_headOfYear') && !$canEditAlert) {
         $page->addError(__('You do not have edit access to this record.'));
         return;
     }
@@ -94,14 +95,14 @@ if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/studentAle
         $row->addLabel('typeLabel', __('Type'));
         $row->addTextField('typeLabel')->readonly()->setValue($alertType['name']);
 
-    if ($highestAction == 'Manage Student Alerts_all' || $highestAction == 'Manage Student Alerts_headOfYear') {
+    if ($action->allowsAny('Manage Student Alerts_all', 'Manage Student Alerts_headOfYear')) {
         $row = $form->addRow();
         $row->addLabel('status', __('Status'));
         $row->addSelect('status')->fromArray(['Pending' => __('Pending'), 'Approved' => __('Approved')])->required();
     } else {
         $row = $form->addRow();
         $row->addLabel('statusLabel', __('Status'));
-        $row->addTextField('statusLabel')->readOnly();
+        $row->addTextField('statusLabel')->readOnly()->setValue($values['status']);
         $form->addHiddenValue('status', $values['status']);
     }
 

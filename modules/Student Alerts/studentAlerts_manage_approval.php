@@ -21,14 +21,15 @@ use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Domain\StudentAlerts\AlertGateway;
+use Gibbon\Support\Facades\Access;
 
 if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/studentAlerts_manage_approval.php')) {
     // Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
     // Proceed!
-    $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction != 'Manage Student Alerts_all') {
+    $action = Access::get('Student Alerts', 'studentAlerts_manage');
+    if (!$action->allowsAny('Manage Student Alerts_all', 'Manage Student Alerts_headOfYear')) {
         $page->addError(__('You do not have access to this action.'));
         return;
     }

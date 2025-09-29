@@ -54,9 +54,9 @@ if (!isActionAccessible($guid, $connection2, "/modules/Student Alerts/studentAle
         ->setURL('/modules/Student Alerts/studentAlerts_manage.php')
         ->setIcon('search')
         ->displayLabel()
-        ->addParam('gibbonPersonID', $_GET['gibbonPersonID'])
-        ->addParam('gibbonFormGroupID', $_GET['gibbonFormGroupID'])
-        ->addParam('gibbonYearGroupID', $_GET['gibbonYearGroupID']);
+        ->addParam('gibbonPersonID', $gibbonPersonID)
+        ->addParam('gibbonFormGroupID', $gibbonFormGroupID)
+        ->addParam('gibbonYearGroupID', $gibbonYearGroupID);
     }
         
     $form->addRow()->addHeading('Add Alert', __('Add Alert'));

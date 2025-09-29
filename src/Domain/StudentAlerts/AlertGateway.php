@@ -109,12 +109,42 @@ class AlertGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
+    public function queryStudentsWithAlertsByFormGroup(QueryCriteria $criteria, $gibbonFormGroupID)
+    {
+        $query = $this
+            ->newQuery()
+            ->from('gibbonPerson')
+            ->cols([
+                'gibbonPerson.gibbonPersonID', 'gibbonStudentEnrolmentID', 'gibbonStudentEnrolment.gibbonSchoolYearID', 'gibbonPerson.title', 'gibbonPerson.preferredName', 'gibbonPerson.surname', 'gibbonPerson.image_240', 'gibbonYearGroup.nameShort AS yearGroup', 'gibbonFormGroup.nameShort AS formGroup', 'gibbonStudentEnrolment.rollOrder', 'gibbonPerson.dateStart', 'gibbonPerson.dateEnd', 'gibbonPerson.status', "'Student' as roleCategory"
+            ])
+            ->innerJoin('gibbonStudentEnrolment', 'gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID')
+            ->innerJoin('gibbonYearGroup', 'gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup.gibbonYearGroupID')
+            ->innerJoin('gibbonFormGroup', 'gibbonStudentEnrolment.gibbonFormGroupID=gibbonFormGroup.gibbonFormGroupID')
+            ->innerJoin('gibbonAlert', 'gibbonAlert.gibbonPersonID=gibbonPerson.gibbonPersonID AND gibbonAlert.gibbonSchoolYearID=gibbonStudentEnrolment.gibbonSchoolYearID')
+            ->where("gibbonPerson.status = 'Full'")
+            ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart <= :today)')
+            ->where('(gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd >= :today)')
+            ->bindValue('today', date('Y-m-d'))
+            ->where('gibbonStudentEnrolment.gibbonFormGroupID = :gibbonFormGroupID')
+            ->bindValue('gibbonFormGroupID', $gibbonFormGroupID)
+            ->groupBy(['gibbonPerson.gibbonPersonID']);
+
+        return $this->runQuery($query, $criteria);
+    }
+
     public function getAlertEditAccess($gibbonAlertID, $gibbonPersonID)
     {
         $data = ['gibbonAlertID' => $gibbonAlertID, 'gibbonPersonID' => $gibbonPersonID];
         $sql = "SELECT (CASE WHEN gibbonPersonIDCreator = :gibbonPersonID THEN TRUE ELSE FALSE END) AS canEdit FROM gibbonAlert WHERE gibbonAlertID = :gibbonAlertID";
 
         return $this->db()->selectOne($sql, $data);
+    }
+
+    public function selectActiveAlertTypes()
+    {
+        $sql = "SELECT name as groupBy, gibbonAlertType.* FROM gibbonAlertType WHERE active='Y' ORDER BY sequenceNumber, name";
+
+        return $this->db()->select($sql);
     }
 
     public function selectAllAlertTypes()

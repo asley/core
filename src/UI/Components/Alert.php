@@ -119,14 +119,12 @@ class Alert
             // Enable filtering only specific types of alerts (eg: activities management pages)
             if (!empty($params['filter']) && !in_array($alert['type'], $params['filter'])) continue;
             
-            $details = $this->getAlertTextAndLink($gibbonPersonID, $alert['type'], $alert['level'] ?? $alert['privacy']);
-
             $output .= Component::render(Alert::class, [
                 'color'   => $alert['levelColor'] ?? $alert['color'] ?? '#939090',
                 'colorBG' => $alert['levelColorBG'] ?? $alert['colorBG'] ?? '#dddddd',
                 'large'   => $params['large'],
                 'target'  => $params['target'] == '_blank' ? '_blank' : '_self',
-            ] + $details + $alert);
+            ] + $alert);
         }
 
         if ($params['wrap'] == true) {
@@ -171,8 +169,10 @@ class Alert
         $alerts = [];
         
         foreach ($allAlerts as $alert) {
+            $details = $this->getAlertTextAndLink($gibbonPersonID, $alert['type'], $alert['level'] ?? $alert['privacy']);
+
             if (empty($alerts[$alert['type']])) {
-                $alerts[$alert['type']] = $alert;
+                $alerts[$alert['type']] = $details + $alert;
                 continue;
             }
 
@@ -183,7 +183,7 @@ class Alert
             $isMoreRecent = $alert['timestampCreated'] > $existing['timestampCreated'];
 
             if ($isHigherLevel || $isHigherContext || $isMoreRecent) {
-                $alerts[$alert['type']] = $alert;
+                $alerts[$alert['type']] = $details + $alert;
             }
         }
 

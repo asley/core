@@ -248,6 +248,18 @@ class AlertGateway extends QueryableGateway
         return $this->db()->select($sql, $data);
     }
 
+    public function getAutomaticAlertCount($gibbonSchoolYearID)
+    {
+        $data = ['gibbonSchoolYearID' => $gibbonSchoolYearID];
+        $sql = "SELECT COUNT(*)
+            FROM gibbonAlert 
+            JOIN gibbonAlertType ON (gibbonAlertType.gibbonAlertTypeID=gibbonAlert.gibbonAlertTypeID)
+            WHERE gibbonAlert.gibbonSchoolYearID=:gibbonSchoolYearID 
+            AND gibbonAlert.context='Automatic'";
+
+        return $this->db()->selectOne($sql, $data);
+    }
+
     public function getHighestAlertByType($gibbonSchoolYearID, $gibbonPersonID, $alertType)
     {
         $data = ['gibbonPersonID' => $gibbonPersonID, 'gibbonSchoolYearID' => $gibbonSchoolYearID, 'status' => 'Approved', 'name' => $alertType];

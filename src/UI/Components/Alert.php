@@ -85,7 +85,7 @@ class Alert
         $this->behaviourGateway = $behaviourGateway;
         $this->alertGateway = $alertGateway;
 
-        $this->alertTypes = $this->alertGateway->selectAllAlertTypes()->fetchGroupedUnique();
+        $this->alertTypes = $this->alertGateway->selectAlertTypes()->fetchGroupedUnique();
     }
 
     /**
@@ -154,6 +154,19 @@ class Alert
     public function isAlertTypeActive(string $type)
     {
         return !empty($this->alertTypes[$type]) && $this->alertTypes[$type]['active'] == 'Y';
+    }
+
+    /**
+     * Gets an array of cached alert type details by name.
+     *
+     * @param string $type
+     * @return array
+     */
+    public function getActiveAlertTypes() : array
+    {
+        return array_filter($this->alertTypes, function ($type) {
+            return $type['active'] == 'Y';
+        });
     }
 
     /**

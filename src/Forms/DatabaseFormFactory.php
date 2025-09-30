@@ -504,7 +504,7 @@ class DatabaseFormFactory extends FormFactory
         if ($params["byForm"]) {
             if ($params["allStudents"]) {
                 $data = array('gibbonSchoolYearID' => $gibbonSchoolYearID);
-                $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, username, gibbonFormGroup.name AS name
+                $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, username, gibbonFormGroup.name AS name, gibbonStudentEnrolment.gibbonYearGroupID
                     FROM gibbonPerson
                         JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID)
                         JOIN gibbonFormGroup ON (gibbonStudentEnrolment.gibbonFormGroupID=gibbonFormGroup.gibbonFormGroupID)
@@ -512,7 +512,7 @@ class DatabaseFormFactory extends FormFactory
                     ORDER BY name, surname, preferredName";
             } elseif ($params["activeStudents"]) {
                 $data = array('gibbonSchoolYearID' => $gibbonSchoolYearID);
-                $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, username, gibbonFormGroup.name AS name
+                $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, username, gibbonFormGroup.name AS name, gibbonStudentEnrolment.gibbonYearGroupID
                     FROM gibbonPerson
                         JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID)
                         JOIN gibbonFormGroup ON (gibbonStudentEnrolment.gibbonFormGroupID=gibbonFormGroup.gibbonFormGroupID)
@@ -521,7 +521,7 @@ class DatabaseFormFactory extends FormFactory
                     ORDER BY name, surname, preferredName";
             } else {
                 $data = array('gibbonSchoolYearID' => $gibbonSchoolYearID, 'date' => date('Y-m-d'));
-                $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, username, gibbonFormGroup.name AS name
+                $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, username, gibbonFormGroup.name AS name, gibbonStudentEnrolment.gibbonYearGroupID
                     FROM gibbonPerson
                         JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID)
                         JOIN gibbonFormGroup ON (gibbonStudentEnrolment.gibbonFormGroupID=gibbonFormGroup.gibbonFormGroupID)
@@ -536,6 +536,8 @@ class DatabaseFormFactory extends FormFactory
 
             if ($results && $results->rowCount() > 0) {
                 while ($row = $results->fetch()) {
+                    if (!empty($params['gibbonYearGroupID']) && $row['gibbonYearGroupID'] != $params['gibbonYearGroupID']) continue;
+
                     if ($multipleBys) {
                         $values[__('Students by Form Group')][$row['gibbonPersonID']] = htmlPrep($row['name']).' - '.Format::name('', htmlPrep($row['preferredName']), htmlPrep($row['surname']), 'Student', true)." (".$row['username'].")";
                     } else {

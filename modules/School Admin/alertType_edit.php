@@ -63,6 +63,10 @@ if (!isActionAccessible($guid, $connection2, '/modules/School Admin/alertLevelSe
         $row->addYesNo('active')->required();
 
     $row = $form->addRow();
+        $row->addLabel('adminOnly', __('Admin Only'))->description(__('If enabled, this type of alert requires full access to Manage Student Alerts.'));
+        $row->addYesNo('adminOnly')->selected('N');
+
+    $row = $form->addRow();
         $row->addLabel('useLevels', __('Alert Levels'))->description(__('Use low/medium/high alert levels?'));
         $row->addYesNo('useLevels')->readonly();
 

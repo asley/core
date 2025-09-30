@@ -49,9 +49,13 @@ if (isActionAccessible($guid, $connection2, '/modules/School Admin/alertLevelSet
         $row->addLabel('tag', __('Tag'));
         $row->addTextField('tag')->maxLength(2);
 
-     $row = $form->addRow();
+    $row = $form->addRow();
         $row->addLabel('description', __('Description'));
         $row->addTextArea('description')->setRows(4);
+
+    $row = $form->addRow();
+        $row->addLabel('adminOnly', __('Admin Only'))->description(__('If enabled, this type of alert requires full access to Manage Student Alerts.'));
+        $row->addYesNo('adminOnly')->selected('N');
 
     $row = $form->addRow();
         $row->addLabel('useLevels', __('Alert Levels'))->description(__('Use low/medium/high alert levels?'));

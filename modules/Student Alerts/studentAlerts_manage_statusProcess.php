@@ -99,8 +99,8 @@ if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/studentAle
 
     // Raise a new notification event
     $notificationData = [
-        'person'    => Format::name('', $session->get('preferredName'), $session->get('surname'), 'Staff', false, true),
-        'user'      => Format::name('', $user['preferredName'], $user['surname'], 'Staff', false, true),
+        'user'      => Format::name('', $session->get('preferredName'), $session->get('surname'), 'Staff', false, true),
+        'creator'   => Format::name('', $user['preferredName'], $user['surname'], 'Staff', false, true),
         'student'   => Format::name('', $student['preferredName'], $student['surname'], 'Student', false, true),
         'actioned'  => strtolower(__($data['status'])),
         'formGroup' => $student['formGroup'],
@@ -112,9 +112,9 @@ if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/studentAle
         __('Type')       => __($alert['type']),
         __('Level')      => __($alert['level']) ?? __('N/A'),
         __('Status')     => __($data['status']),
-        __('Created By') => $notificationData['user'],
+        __('Created By') => $notificationData['creator'],
         __('Comment')    => $alert['comment'],
-        __('Updated By') => $notificationData['person'],
+        __('Updated By') => $notificationData['user'],
         __('Notes')      => $data['notesStatus'],
     ];
 
@@ -128,7 +128,7 @@ if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/studentAle
     if ($data['status'] == 'Approved') {
         $event = new NotificationEvent('Student Alerts', 'New Student Alert');
         $event->setNotificationDetails($notificationDetails);
-        $event->setNotificationText(__('{student} ({formGroup}) has a new {type} alert', $notificationData));
+        $event->setNotificationText(__('{user} has added a new {type} alert for {student} ({formGroup})', $notificationData));
         $event->setActionLink(Url::fromModuleRoute('Student Alerts', 'studentAlerts_manage_view')->withQueryParams([
             'gibbonAlertID' => $gibbonAlertID,
         ])->withPath(''));

@@ -41,6 +41,7 @@ if (!isActionAccessible($guid, $connection2, '/modules/School Admin/alertLevelSe
         'colorBG'       => $_POST['colorBG'] ?? null,
         'active'        => $_POST['active'] ?? 'Y',
         'adminOnly'     => $_POST['adminOnly'] ?? 'N',
+        'automatic'     => $_POST['automatic'] ?? 'N',
         'thresholdLow'  => $_POST['thresholdLow'] ?? null,
         'thresholdMed'  => $_POST['thresholdMed'] ?? null,
         'thresholdHigh' => $_POST['thresholdHigh'] ?? null,

@@ -150,7 +150,10 @@ if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/studentAle
     } else {
         $event = new NotificationEvent('Student Alerts', 'New Student Alert');
         $event->setNotificationDetails($notificationDetails);
-        $event->setNotificationText(__('{user} has added a new {type} alert for {student} ({formGroup})', $notificationData));
+        $event->setNotificationText(!empty($data['gibbonCourseClassID'])
+                ? __('{user} has added a new class-level {type} alert for {student} ({formGroup})', $notificationData)
+                : __('{student} ({formGroup}) has a new {type} alert', $notificationData)
+            );
         $event->setActionLink(Url::fromModuleRoute('Student Alerts', 'studentAlerts_manage_view')->withQueryParams([
             'gibbonAlertID' => $gibbonAlertID,
         ])->withPath(''));

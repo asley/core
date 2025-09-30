@@ -96,6 +96,16 @@ if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/studentAle
                 ->setValue($alert['comment'])
                 ->readonly()
                 ->setRows(3);
+
+    if ($alert['status'] != 'Pending') {
+        $row = $form->addRow();
+        $col = $row->addColumn();
+        $col->addLabel('notes', __('Notes'));
+        $col->addTextArea('notes')
+            ->setValue($alert['notesStatus'])
+            ->readonly()
+            ->setRows(3);
+    }
                 
     echo $form->getOutput();
 }

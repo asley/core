@@ -86,13 +86,11 @@ if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/studentAle
         ->fromPOST();
 
     $canManageAlerts = $action->allowsAny('Manage Student Alerts_all', 'Manage Student Alerts_headOfYear');
-
     if (!$canManageAlerts && empty($gibbonPersonID) && empty($gibbonFormGroupID) && empty($gibbonYearGroupID)) {
         $alerts = $alertGateway->queryAlertsBySchoolYear($criteria, $session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'));
     } else {
         $alerts = $alertGateway->queryAlertsBySchoolYear($criteria, $session->get('gibbonSchoolYearID'));
     }
-
 
     // DATA TABLE
     $table = DataTable::createPaginated('manageAlerts', $criteria);
@@ -158,6 +156,7 @@ if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/studentAle
         });
     
     $table->addColumn('class', __('Class'))
+        ->sortable(['courseName', 'className'])
         ->format(function ($values) {
             return !empty($values['gibbonCourseClassID']) 
                 ? Format::courseClassName($values['courseName'], $values['className'])

@@ -49,7 +49,7 @@ require_once __DIR__.'/functions.php';
 // Core Services
 $container = new League\Container\Container();
 $container->delegate(new League\Container\ReflectionContainer);
-$container->add('autoloader', $autoloader);
+$container->share('autoloader', $autoloader);
 
 $container->inflector(\League\Container\ContainerAwareInterface::class)
           ->invokeMethod('setContainer', [$container]);

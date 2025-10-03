@@ -38,6 +38,7 @@ v30.0.00
         Activities: added a description field to the cost section for activities
         Activities: included the photos in the new copy when an activity is duplicated
         Behaviour: added Add Multiple button to Behaviour tab of student profile
+        Formal Assessment: added a Year Group filter option to Manage External Assessment
         Individual Needs: enabled viewing IN records for past students as read-only
         Library: added the option to send an email to parents when lending a library item
         Messenger: enabled resending to any recipient when read receipts are off in Send Report

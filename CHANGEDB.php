@@ -1010,4 +1010,6 @@ INSERT INTO `gibbonPermission` (`gibbonRoleID` ,`gibbonActionID`) VALUES (002, (
 INSERT INTO `gibbonPermission` (`gibbonRoleID` ,`gibbonActionID`) VALUES (002, (SELECT gibbonActionID FROM gibbonAction JOIN gibbonModule ON (gibbonAction.gibbonModuleID=gibbonModule.gibbonModuleID) WHERE gibbonModule.name='Student Alerts' AND gibbonAction.name='Student Alerts by Form Group'));end
 ALTER TABLE `gibbonAlertType` ADD `automatic` enum('Y','N') NOT NULL DEFAULT 'N' AFTER `active`;end
 UPDATE `gibbonAlertType` SET `automatic`='Y' WHERE type='Core';end
+UPDATE `gibbonNotificationEvent` SET event='New Global Alert' WHERE event='New Student Alert' AND moduleName='Student Alerts';end
+INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('New Class Alert', 'Student Alerts', 'Manage Student Alerts', 'Core', 'All,gibbonPersonIDStudent,gibbonYearGroupID', 'Y');end
 ";

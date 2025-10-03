@@ -148,7 +148,7 @@ if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/studentAle
         $yearGroup = $container->get(YearGroupGateway::class)->getByID($student['gibbonYearGroupID']);
         $event->addRecipient($yearGroup['gibbonPersonIDHOY'] ?? '');
     } else {
-        $event = new NotificationEvent('Student Alerts', 'New Student Alert');
+        $event = new NotificationEvent('Student Alerts', !empty($data['gibbonCourseClassID']) ? 'New Class Alert' : 'New Global Alert');
         $event->setNotificationDetails($notificationDetails);
         $event->setNotificationText(!empty($data['gibbonCourseClassID'])
                 ? __('{user} has added a new class-level {type} alert for {student} ({formGroup})', $notificationData)

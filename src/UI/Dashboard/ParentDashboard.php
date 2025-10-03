@@ -535,6 +535,7 @@ class ParentDashboard implements OutputableInterface, ContainerAwareInterface
                 $activitiesOutput .= Format::alert(__('There are no records to display.'), 'empty');
             }
             
+            /* @phpstan-ignore class.notFound */
             $activitiesOutput .= $this->container->get(ActivitiesViewParent::class)
                 ->createTable($gibbonSchoolYearID, $gibbonPersonID, $student)
                 ->getOutput();

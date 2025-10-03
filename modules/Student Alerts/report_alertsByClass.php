@@ -109,6 +109,7 @@ if (!isActionAccessible($guid, $connection2, '/modules/Student Alerts/report_ale
     foreach ($alertTypes as $alertType) {
         $table->addColumn($alertType['gibbonAlertTypeID'], __($alertType['name']))
             ->notSortable()
+            ->width('10%')
             ->format(function($student) use ($alertType) {
                 $alert = $student['alerts'][$alertType['name']] ?? [];
                 $classAlerts = $student['classAlerts'][$alertType['name']] ?? [];

@@ -51,6 +51,7 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/systemCheck.p
     $mysqlRequirement = $gibbon->getSystemRequirement('mysql');
     $apacheRequirement = $gibbon->getSystemRequirement('apache');
     $extensions = $gibbon->getSystemRequirement('extensions');
+    $recommended = $gibbon->getSystemRequirement('recommended');
     $settings = $gibbon->getSystemRequirement('settings');
 
     // File Check
@@ -121,10 +122,11 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/systemCheck.p
             ->addHeading('PHP Extensions', __('PHP Extensions'))
             ->append(__('Gibbon requires you to enable the PHP extensions in the following list. The process to do so depends on your server setup.'));
 
-        foreach ($extensions as $extension) {
+        $extensionList = array_merge($extensions, $recommended);
+        foreach ($extensionList as $extension) {
             $installed = @extension_loaded($extension);
             $row = $form->addRow();
-                $row->addLabel('extensionLabel', $extension);
+                $row->addLabel('extensionLabel', $extension)->description(in_array($extension, $recommended) ? __('Recommended') : '');
                 $row->addTextField('extension')->setValue(($installed)? __('Installed') : __('Not Installed'))->readonly()
                     ->append(($installed)? $trueIcon : $falseIcon);
         }

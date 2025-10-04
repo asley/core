@@ -105,7 +105,7 @@ class TimetableDayDateGateway extends QueryableGateway
             AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID 
             AND NOT role LIKE '% - Left' 
             AND gibbonTTDayRowClassException.gibbonTTDayRowClassExceptionID IS NULL
-        GROUP BY gibbonTTDayRowClass.gibbonTTDayRowClassID 
+        GROUP BY gibbonTTDayRowClass.gibbonTTDayRowClassID, gibbonTTDayDate.gibbonTTDayDateID
         ORDER BY timeStart, timeEnd, FIND_IN_SET(gibbonCourseClassPerson.role, 'Teacher,Assistant,Student') DESC
         ";
 

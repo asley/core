@@ -1018,4 +1018,5 @@ INSERT INTO `gibbonPermission` (`gibbonRoleID` ,`gibbonActionID`) VALUES ('001',
 UPDATE `gibboni18n` SET `active` = 'Y',`version` = '30.0.00',`installed` = 'Y'  WHERE `code` = 'ja_JP';end
 UPDATE `gibboni18n` SET `active` = 'Y',`version` = '30.0.00',`installed` = 'Y'  WHERE `code` = 'pt_PT';end
 UPDATE `gibbonSetting` SET value=REPLACE(value,',Pastoral,Pastoral,',',Pastoral,') WHERE name='mainMenuCategoryOrder';end
+ALTER TABLE `gibbonPersonMedical` CHANGE `longTermMedication` `longTermMedication` ENUM('','Y','N') NOT NULL DEFAULT 'N';end
 ";

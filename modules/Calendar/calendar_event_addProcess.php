@@ -62,8 +62,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Calendar/calendar_event_ad
     ];
 
     if ($data['allDay'] == 'N') {
-        $data['timeStart'] = $dateStart->format('H:i:s');
-        $data['timeEnd'] = $dateEnd->format('H:i:s');
+        $data['timeStart'] = $_POST['timeStart'] ?? '';
+        $data['timeEnd'] = $_POST['timeEnd'] ?? '';
     }
 
     if ($data['locationType'] == 'Internal') {
@@ -127,7 +127,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Calendar/calendar_event_ad
     $gibbonCalendarEventPersonID = $calendarEventPersonGateway->insert($organiserData);
     $partialFail &= !$gibbonCalendarEventPersonID;
 
-     $URL .= $partialFail
+    $URL .= $partialFail
         ? "&return=warning1"
         : "&return=success0&editID=$gibbonCalendarEventID";
     header("Location: {$URL}");

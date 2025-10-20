@@ -33,7 +33,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Calendar/calendar_manage.p
 
     $page->breadcrumbs
         ->add(__('Manage Calendars'), 'calendar_manage.php')
-        ->add(__('Manage Event Types'), 'calendar_eventTypes_manage.php')
+        ->add(__('Event Types'), 'calendar_eventTypes_manage.php')
         ->add($action == 'edit' ? __('Edit Event Type') : __('Add Event Type'));
     
     if (empty($gibbonCalendarEventTypeID) && isset($_GET['editID'])) {

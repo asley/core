@@ -28,7 +28,7 @@ $gibbonCalendarEventTypeID = $_POST['gibbonCalendarEventTypeID'] ?? '';
 
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/Calendar/calendar_eventTypes_manage.php';
 
-if (isActionAccessible($guid, $connection2, '/modules/Calendar/calendar_eventTypes_manage_delete.php') == false) {
+if (isActionAccessible($guid, $connection2, '/modules/Calendar/calendar_eventTypes_manage.php') == false) {
     $URL .= '&return=error0';
     header("Location: {$URL}");
     exit;

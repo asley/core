@@ -30,7 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Calendar/calendar_manage.p
     // Proceed!
     $page->breadcrumbs
         ->add(__('Manage Calendars'), 'calendar_manage.php')
-        ->add(__('Manage Event Types'));
+        ->add(__('Event Types'));
 
     $gibbonSchoolYearID = $_REQUEST['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
     
@@ -44,6 +44,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Calendar/calendar_manage.p
 
     // DATA TABLE
     $table = DataTable::createPaginated('eventTypes', $criteria);
+    $table->setTitle(__('Event Types'));
 
     $table->addHeaderAction('add', __('Add'))
         ->setURL('/modules/Calendar/calendar_eventTypes_manage_addEdit.php')

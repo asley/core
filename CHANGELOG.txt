@@ -24,6 +24,7 @@ v30.0.00
 
     Headlines
         Added a new Student Alerts module to manage automatic and manual alerts
+        Catalan, Japanese and Portugese are now available interface languages
 
     Security
 
@@ -35,8 +36,7 @@ v30.0.00
         System: updated SpreadsheetRenderer to support exporting data from multiple DataTables
         System: switched interface strings from Value Added License to Catalyst License
         System: added a backup table to store person images from previous years
-        System: added Balochi as a language option in dropdown menus
-        System: set Japanese and Portugese as an active language
+        System: set Catalan, Japanese and Portugese as active languages
         System: added Balochi as a spoken language option for user data
         Activities: added the option for parents to register their children in activities
         Activities: added student tags on the Manage Enrolment page

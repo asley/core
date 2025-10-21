@@ -281,24 +281,4 @@ trait InputAttributesTrait
     {
         return $this->getAttribute('aria-'.$property);
     }
-
-    /**
-     * Sets the inputs label via the underlying row.
-     * @param  string      $label
-     * @return self
-     */
-    public function label(string $label, string $description = '')
-    {
-        if (!$this instanceof RowDependancyInterface) return;
-        if (empty($this->row)) return;
-
-        $this->row->setLabel($this->getID() ?? $this->getName() ?? '', $label, $description);
-
-        return $this;
-    }
-
-    public function attach()
-    {
-        return $this->row;
-    }
 }

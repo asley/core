@@ -31,6 +31,7 @@ use Gibbon\Forms\FormFactoryInterface;
 use Gibbon\Tables\DataTable;
 use Gibbon\Tables\Action;
 use Gibbon\Contracts\Services\Session;
+use Gibbon\Forms\Layout\Section;
 
 /**
  * FormFactory
@@ -52,6 +53,14 @@ class FormFactory implements FormFactoryInterface
     }
 
     /* LAYOUT TYPES --------------------------- */
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createSection($id, $heading = ''): Section
+    {
+        return new Layout\Section($this, $id, $heading);
+    }
 
     /**
      * {@inheritDoc}

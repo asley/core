@@ -155,8 +155,8 @@ class Section
 
     public function removeRow($id)
     {
-        if (!empty($rows[$id])) {
-            unset($rows[$id]);
+        if (!empty($this->rows[$id])) {
+            unset($this->rows[$id]);
         }
 
         return $this;

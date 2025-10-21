@@ -342,12 +342,6 @@ class Form implements OutputableInterface
         return end($this->sections);
     }
 
-    public function attach()
-    {
-        return $this->getCurrentRow();
-    }
-    
-
     /**
      * Adds a Row object to the form and returns it.
      * @param  string  $id
@@ -367,7 +361,7 @@ class Form implements OutputableInterface
 
     /**
      * Get the last added Row object, null if none exist.
-     * @return  Row|null
+     * @return  Row
      */
     public function getRow() : Row
     {

@@ -21,6 +21,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 namespace Gibbon\Forms\Traits;
 
+use Gibbon\Forms\RowDependancyInterface;
+
 /**
  * Basic HTML Input Attributes (name, type, value, required)
  *
@@ -287,6 +289,7 @@ trait InputAttributesTrait
      */
     public function label(string $label, string $description = '')
     {
+        if (!$this instanceof RowDependancyInterface) return;
         if (empty($this->row)) return;
 
         $this->row->setLabel($this->getID() ?? $this->getName() ?? '', $label, $description);

@@ -81,10 +81,10 @@ class Meta extends Row
         foreach ($sections as $section) {
             if (empty($section->getHeading())) continue;
 
-            $links[] = Format::link('#'.$section->getID(), $section->getHeading(), ['target' => '_self', 'class' => 'block py-1 text-gray-700 text-xs hover:underline']);
+            $links[] = Format::link('#'.$section->getID(), $section->getHeading(), ['target' => '_self', 'class' => 'block py-0.5 text-gray-700 text-xs hover:underline']);
         }
 
-        $output .= Format::list($links, 'ul', 'ml-3');
+        $output .= Format::list($links, 'ul', 'ml-6');
 
         $this->addContent($output);
 

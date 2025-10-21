@@ -205,7 +205,7 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
                     <template x-for="v in $validate.data($refs.form)" >
                         <template x-if="!v.valid && v.node.labels.length > 0">
                         <li>
-                            <span x-text="v.node.labels[0].ariaLabel" :aria-label="v.name" class="text-xs"></span>
+                            <a x-bind:href="'#' + v.name" target="_self" x-text="v.node.labels[0].ariaLabel" :aria-label="v.name" class="text-xs py-0.5 hover:underline"></a>
                         </li>
                         </template>
                     </template>

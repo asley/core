@@ -289,8 +289,13 @@ trait InputAttributesTrait
     {
         if (empty($this->row)) return;
 
-        $this->row->setLabel($this->getID(), $label, $description);
+        $this->row->setLabel($this->getID() ?? $this->getName() ?? '', $label, $description);
 
         return $this;
+    }
+
+    public function attach()
+    {
+        return $this->row;
     }
 }

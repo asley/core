@@ -73,6 +73,24 @@ class Meta extends Row
         return $this;
     }
 
+    public function addSectionList(array $sections)
+    {
+        $output = '<h5 class="text-sm font-semibold text-gray-800 mt-0 mb-2 ">'. __('Jump To').'</h5>';
+        $links = [];
+
+        foreach ($sections as $section) {
+            if (empty($section->getHeading())) continue;
+
+            $links[] = Format::link('#'.$section->getID(), $section->getHeading(), ['target' => '_self', 'class' => 'block py-1 text-gray-700 text-xs hover:underline']);
+        }
+
+        $output .= Format::list($links, 'ul', 'ml-3');
+
+        $this->addContent($output);
+
+        return $this;
+    }
+
     protected function checkActionList($actionString, $validActions)
     {
         foreach ($validActions as $action) {

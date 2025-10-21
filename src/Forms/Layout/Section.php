@@ -41,6 +41,7 @@ class Section
 
     protected $factory;
     protected $heading;
+    protected $open = true;
     
     protected $rows = [];
 
@@ -63,7 +64,7 @@ class Section
     public function setHeading($heading)
     {
         if (empty($this->heading) && !empty($heading)) {
-            $this->addRow()->addHeading($this->getID(), $heading);
+            $this->addRow()->addHeading($heading, $heading);
         }
 
         $this->heading = $heading;
@@ -88,7 +89,7 @@ class Section
         }
         
         if (empty($row->getHeading())) {
-            $row->setHeading($this->getID());
+            $row->setHeading($this->getHeading());
         }
 
         $id = $this->getUniqueIdentifier($row);
@@ -96,6 +97,19 @@ class Section
         $this->rows[$id] = $row;
 
         return $row;
+    }
+
+    /**
+     * Set all rows from an array.
+     *
+     * @param array $rows
+     * @return self
+     */
+    public function setRows(array $rows)
+    {
+        $this->rows = $rows;
+
+        return $this;
     }
 
     /**
@@ -137,6 +151,27 @@ class Section
         }
 
         return end($this->rows);
+    }
+
+    public function removeRow($id)
+    {
+        if (!empty($rows[$id])) {
+            unset($rows[$id]);
+        }
+
+        return $this;
+    }
+
+    public function opened(bool $open)
+    {
+        $this->open = $open;
+
+        return $this;
+    }
+
+    public function getOpen()
+    {
+        return $this->open;
     }
 
     /**

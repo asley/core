@@ -323,6 +323,11 @@ class Form implements OutputableInterface
         return $this->sections;
     }
 
+    public function getSectionCount()
+    {
+        return count($this->sections);
+    }
+
     public function getCurrentRow()
     {
         return $this->getCurrentSection()->getCurrentRow();
@@ -398,11 +403,29 @@ class Form implements OutputableInterface
      */
     public function getRowsByHeading()
     {
-        return array_reduce($this->getRows(), function ($group, $row) {
+        $group = array_reduce($this->getRows(), function ($group, $row) {
             if ($row->getElementCount() == 0) return $group;
             $group[$row->getHeading()][] = $row;
             return $group;
         }, []);
+
+        return $group;
+    }
+
+    /**
+     * Reset sections based on row headings, backwards compatibility
+     *
+     * @return void
+     */
+    protected function resetSections()
+    {
+        $rows = $this->getRowsByHeading();
+        $this->sections = [];
+
+        foreach ($rows as $heading => $rows) {
+            $label = $heading != 'submit' ? $heading : '';
+            $this->addSection($heading, $label)->setRows($rows);
+        }
     }
 
     /**
@@ -713,6 +736,14 @@ class Form implements OutputableInterface
      */
     public function getOutput()
     {
+        if ($this->hasMeta()) {
+            if (count($this->sections) <= 2) $this->resetSections();
+
+            if ($this->sections > 2) {
+                $this->getMeta()->addSectionList($this->getSections());
+            }
+        }
+
         return $this->renderer->renderForm($this);
     }
 }

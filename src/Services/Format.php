@@ -473,6 +473,8 @@ class Format
      */
     public static function number($value, $decimals = 0)
     {
+        if (is_string($value)) $value = $decimals > 0 ? floatval($value) : intval($value);
+
         return number_format($value, $decimals);
     }
 
@@ -486,6 +488,8 @@ class Format
     public static function currency($value, $includeName = false, $decimals = 2)
     {
         if (is_null($value)) return '';
+
+        if (is_string($value)) $value = $decimals > 0 ? floatval($value) : intval($value);
 
         return static::$settings['currencySymbol'] . number_format($value, $decimals) . ( $includeName ? ' ('.static::$settings['currencyName'].')' : '');
     }
@@ -536,6 +540,7 @@ class Format
     public static function filesize($bytes)
     {
         $unit = ['bytes','KB','MB','GB','TB','PB'];
+        $bytes = round($bytes);
         return !empty($bytes)
             ? @round($bytes/pow(1024, ($i=floor(log($bytes, 1024)))), 2).' '.$unit[$i]
             : '0 KB';
@@ -773,6 +778,11 @@ class Format
         return ($address? $address.'<br/>' : '') . ($addressDistrict? $addressDistrict.'<br/>' : '') . ($addressCountry? $addressCountry.'<br/>' : '');
     }
 
+    public static function heading(string $text, string $tag = 'h3', string $class = '')
+    {
+        return "<{$tag} class='{$class}'>{$text}</{$tag}>";
+    }
+
     public static function list(array $items, $tag = 'ul', $listClass = '', $itemClass = 'leading-normal')
     {
         $output = "<$tag class='$listClass'>";
@@ -789,8 +799,7 @@ class Format
         $output = "<$tag class='$listClass'>";
         foreach ($items as $label => $value) {
             if ($label == 'heading' || $label == 'subheading') {
-                $hTag = $label == 'heading' ? 'h3' : 'h4';
-                $output .= "<li class='{$itemClass}'><{$hTag}>".$value."</{$hTag}></li>";
+                $output .= "<li class='{$itemClass}'>".static::heading($value, $label == 'heading' ? 'h3' : 'h4')."</li>";
             } else {
                 $output .= "<li class='{$itemClass}'><strong>".$label.'</strong>: '.$value.'</li>';
             }
@@ -1172,11 +1181,20 @@ class Format
      */
     public static function colorSwatch($color)
     {
-        $color = trim(preg_replace('/[^a-fA-F0-9]/', '', $color), '#');
-        $colorHex = !empty($color) ? '#'.$color : '#ffffff00';
-        $colorTitle = !empty($color) ? $colorHex : __('None');
+        $colorValue = '#ffffff00';
+        $colorTitle = '';
 
-        return '<div class="rounded-md border h-8 w-8" style="background-color:'.$colorHex.'" title="'.$colorTitle.'"></div>';
+        if (substr($color, 0, 1) == '#') {
+            $color = trim(preg_replace('/[^a-fA-F0-9]/', '', $color), '#');
+            $colorValue = !empty($color) ? '#'.$color : '#ffffff00';
+            $colorTitle = !empty($color) ? $colorValue : __('None');
+        } elseif (substr($color, 0, 3) == 'rgb') {
+            $color = preg_replace('/[^rgba0-9., \(\)]/', '', $color);
+            $colorValue = !empty($color) ? $color : '#ffffff00';
+            $colorTitle = !empty($color) ? $colorValue : __('None');
+        }
+
+        return '<div class="rounded-md border h-8 w-8" style="background-color:'.$colorValue.'" title="'.$colorTitle.'"></div>';
     }
 
     /**

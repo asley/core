@@ -169,6 +169,13 @@ class Section
         return $this;
     }
 
+    public function closed()
+    {
+        $this->open = false;
+
+        return $this;
+    }
+
     public function getOpen()
     {
         return $this->open;
